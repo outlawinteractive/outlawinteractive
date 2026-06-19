@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Deserted Outlaws</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -18,333 +17,304 @@ scroll-behavior:smooth;
 }
 
 body{
-font-family:'Oswald',sans-serif;
-background:#000;
+background:#050505;
 color:white;
+font-family:Inter,sans-serif;
 overflow-x:hidden;
 }
 
 .hero{
 height:100vh;
-background:
-linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.7)),
-url('hero.jpg');
-background-size:cover;
-background-position:center;
 display:flex;
 justify-content:center;
 align-items:center;
 text-align:center;
+padding:20px;
+background:
+linear-gradient(to bottom,
+rgba(0,0,0,.4),
+rgba(0,0,0,.85)),
+url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80');
+background-size:cover;
+background-position:center;
 }
 
-.hero-content img{
-width:500px;
-max-width:90%;
-margin-bottom:20px;
+.hero-content h1{
+font-family:Cinzel,serif;
+font-size:clamp(4rem,10vw,9rem);
+line-height:0.9;
+letter-spacing:5px;
 }
 
-.hero h1{
-font-size:7rem;
-letter-spacing:8px;
-}
-
-.hero p{
-font-size:2rem;
-color:#f8c26b;
+.hero-content p{
+font-size:1.4rem;
 margin:20px 0;
+color:#D9A441;
 }
 
-.btn{
+.button{
 display:inline-block;
 padding:15px 35px;
-background:#f8c26b;
+background:#D9A441;
 color:black;
 text-decoration:none;
 font-weight:bold;
-margin:10px;
-border-radius:50px;
-transition:.3s;
+border-radius:40px;
+margin-top:20px;
 }
 
-.btn:hover{
-transform:scale(1.05);
+.ticker{
+background:#D9A441;
+color:black;
+padding:15px;
+font-weight:700;
+white-space:nowrap;
+overflow:hidden;
 }
 
-.section-title{
-text-align:center;
-font-size:4rem;
-padding:100px 20px 50px;
+.ticker span{
+display:inline-block;
+padding-left:100%;
+animation:scroll 20s linear infinite;
 }
 
-.character{
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:50px;
-gap:50px;
-background:#111;
+@keyframes scroll{
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
 }
 
-.character:nth-child(even){
-background:#1a1a1a;
-}
-
-.character img{
-width:450px;
-max-width:100%;
-border-radius:20px;
-}
-
-.character-text{
-max-width:600px;
-}
-
-.character-text h2{
-font-size:4rem;
-color:#f8c26b;
-}
-
-.character-text h3{
-font-size:2rem;
-margin-bottom:20px;
-}
-
-.character-text p{
-font-size:1.2rem;
-line-height:1.8;
-}
-
-.world{
+.section{
 padding:120px 10%;
+}
+
+.title{
+font-family:Cinzel;
+font-size:3rem;
+margin-bottom:50px;
 text-align:center;
-background:url('desert-bg.jpg');
-background-size:cover;
-background-position:center;
+color:#D9A441;
 }
 
-.world h2{
-font-size:5rem;
-margin-bottom:20px;
-}
-
-.world p{
-font-size:1.5rem;
-max-width:1000px;
+.character-box{
+max-width:900px;
 margin:auto;
+background:#111;
+padding:40px;
+border:1px solid #333;
+border-radius:20px;
+text-align:center;
 }
 
-.features{
-padding:120px 10%;
-background:black;
+.character-box h2{
+font-family:Cinzel;
+font-size:3rem;
 }
 
-.feature-grid{
+.character-box h3{
+color:#D9A441;
+margin:10px 0 25px;
+}
+
+.character-box p{
+line-height:1.8;
+font-size:1.1rem;
+}
+
+.controls{
+margin-top:30px;
+}
+
+.controls button{
+background:#D9A441;
+border:none;
+padding:12px 25px;
+margin:0 10px;
+cursor:pointer;
+font-weight:bold;
+border-radius:8px;
+}
+
+.map{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
-margin-top:50px;
+gap:20px;
 }
 
-.feature{
-background:#161616;
+.location{
+background:#111;
 padding:30px;
 border-radius:15px;
+border:1px solid #333;
 }
 
-.feature h3{
-color:#f8c26b;
+.location h3{
+color:#D9A441;
 margin-bottom:10px;
 }
 
-.gallery{
-padding:120px 5%;
-background:#111;
-}
-
-.gallery-grid{
+.features{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:15px;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
 
-.gallery-grid img{
-width:100%;
-height:300px;
-object-fit:cover;
+.feature{
+background:#111;
+padding:30px;
 border-radius:15px;
+border-left:5px solid #D9A441;
 }
 
-.footer{
+.feature h3{
+margin-bottom:10px;
+color:#D9A441;
+}
+
+.quote{
 height:60vh;
 display:flex;
 justify-content:center;
 align-items:center;
 text-align:center;
-flex-direction:column;
-background:linear-gradient(#111,#000);
+font-family:Cinzel;
+font-size:2.5rem;
+padding:40px;
+background:#0a0a0a;
 }
 
-.footer h2{
+.footer{
+padding:120px 20px;
+text-align:center;
+background:black;
+}
+
+.footer h1{
+font-family:Cinzel;
 font-size:5rem;
+line-height:0.9;
 }
 
 .footer p{
 font-size:2rem;
-color:#f8c26b;
-margin:20px 0;
-}
-
-@media(max-width:900px){
-
-.character{
-flex-direction:column;
-text-align:center;
-}
-
-.hero h1{
-font-size:4rem;
-}
-
-.section-title{
-font-size:3rem;
-}
-
-.character-text h2{
-font-size:3rem;
-}
-
+margin-top:20px;
+color:#D9A441;
 }
 
 </style>
-
 </head>
 <body>
 
 <section class="hero">
-
 <div class="hero-content">
+<h1>DESERTED<br>OUTLAWS</h1>
+<p>The Frontier Belongs To Nobody.</p>
+<a href="#" class="button">COMING 2027</a>
+</div>
+</section>
 
-<img src="logo.png" alt="Deserted Outlaws Logo">
-
-<h1>DESERTED OUTLAWS</h1>
-
-<p>COMING 2027</p>
-
-<a href="#" class="btn">WATCH TRAILER</a>
-<a href="#" class="btn">WISHLIST</a>
-
+<div class="ticker">
+<span>
+WANTED POSTERS UPDATED • NEW OUTLAW SIGHTINGS • RED MESA COUNTY LOCKDOWN • TRAIN ROBBERIES REPORTED •
+</span>
 </div>
 
-<section class="characters">
+<section class="section">
 
-<h1>MEET THE OUTLAWS</h1>
+<h1 class="title">MEET THE OUTLAWS</h1>
 
-<div class="slider">
+<div class="character-box">
 
-<button id="prev">&#10094;</button>
-
-<div class="slide-content">
 <h2 id="name"></h2>
 <h3 id="nickname"></h3>
 <p id="description"></p>
+
+<div class="controls">
+<button onclick="previousCharacter()">◀ Previous</button>
+<button onclick="nextCharacter()">Next ▶</button>
 </div>
 
-<button id="next">&#10095;</button>
-
-</div>
-
-<div class="dots">
-<span class="dot active"></span>
-<span class="dot"></span>
-<span class="dot"></span>
-<span class="dot"></span>
-<span class="dot"></span>
 </div>
 
 </section>
 
-<style>
+<section class="section">
 
-.characters{
-padding:120px 20px;
-background:#111;
-text-align:center;
-color:white;
-font-family:Arial,sans-serif;
-}
+<h1 class="title">THE BADLANDS</h1>
 
-.characters h1{
-font-size:4rem;
-margin-bottom:60px;
-color:#f8c26b;
-letter-spacing:3px;
-}
+<div class="map">
 
-.slider{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:40px;
-max-width:1200px;
-margin:auto;
-}
+<div class="location">
+<h3>Dustfall Ridge</h3>
+<p>A canyon region battered by endless storms.</p>
+</div>
 
-.slide-content{
-max-width:800px;
-padding:40px;
-background:#1b1b1b;
-border-radius:20px;
-border:2px solid #f8c26b;
-}
+<div class="location">
+<h3>Blackwater Mine</h3>
+<p>An abandoned mine filled with secrets.</p>
+</div>
 
-.slide-content h2{
-font-size:3rem;
-margin-bottom:10px;
-color:#f8c26b;
-}
+<div class="location">
+<h3>Coyote Flats</h3>
+<p>Open desert territory ruled by bounty hunters.</p>
+</div>
 
-.slide-content h3{
-font-size:1.8rem;
-margin-bottom:25px;
-}
+<div class="location">
+<h3>Saint Mercy</h3>
+<p>The last civilized town in Red Mesa County.</p>
+</div>
 
-.slide-content p{
-font-size:1.2rem;
-line-height:1.8;
-}
+</div>
 
-.slider button{
-background:none;
-border:none;
-font-size:4rem;
-color:#f8c26b;
-cursor:pointer;
-transition:0.3s;
-}
+</section>
 
-.slider button:hover{
-transform:scale(1.2);
-}
+<section class="section">
 
-.dots{
-margin-top:40px;
-}
+<h1 class="title">FEATURES</h1>
 
-.dot{
-height:14px;
-width:14px;
-background:#444;
-display:inline-block;
-border-radius:50%;
-margin:0 6px;
-}
+<div class="features">
 
-.dot.active{
-background:#f8c26b;
-}
+<div class="feature">
+<h3>Open World Frontier</h3>
+<p>Explore deserts, towns and hidden outlaw camps.</p>
+</div>
 
-</style>
+<div class="feature">
+<h3>Train Robberies</h3>
+<p>Raid moving trains across the badlands.</p>
+</div>
+
+<div class="feature">
+<h3>Bounty Hunting</h3>
+<p>Track criminals and collect rewards.</p>
+</div>
+
+<div class="feature">
+<h3>Dynamic Wanted System</h3>
+<p>Your reputation changes the world around you.</p>
+</div>
+
+<div class="feature">
+<h3>Survival</h3>
+<p>Manage supplies, camps and harsh weather.</p>
+</div>
+
+<div class="feature">
+<h3>Online Posses</h3>
+<p>Ride with friends and build your legend.</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="quote">
+"The law ends where the desert begins."
+</section>
+
+<section class="footer">
+<h1>DESERTED<br>OUTLAWS</h1>
+<p>COMING 2027</p>
+</section>
 
 <script>
 
@@ -353,83 +323,69 @@ const characters = [
 {
 name:"Lila Kane",
 nickname:"'Viper'",
-description:"The central gunslinger. A sharp-tongued, deadly accurate bounty hunter with a mysterious past. Wields dual revolvers and never misses. Cool, confident, and always one step ahead of the law."
+description:"The central gunslinger. A sharp-tongued, deadly accurate bounty hunter with a mysterious past. Wields dual revolvers and never misses."
 },
 
 {
 name:"Silas Crowe",
 nickname:"'Ghost'",
-description:"A hardened, scarred outlaw leader. Former sheriff turned renegade. Carries a lever-action rifle and a grudge the size of the desert. Quiet, ruthless, and respected — and feared — by every gang in the badlands."
+description:"Former sheriff turned renegade. Carries a lever-action rifle and commands respect through fear and reputation."
 },
 
 {
 name:"Rosa Delgado",
 nickname:"'Bandit Queen'",
-description:"A charismatic blonde outlaw known for robbing stagecoaches and banks. Clever, seductive, and fast with a knife or pistol. Always seems to have a wanted poster in her hand — sometimes her own."
+description:"Charismatic outlaw famous for robbing banks and stagecoaches while always staying one step ahead."
 },
 
 {
 name:"Jax Ryder",
 nickname:"'Iron Horse'",
-description:"A wild ex-cavalry rider turned motorcycle gunslinger. Rides a customized black desert chopper through dust storms. Explosive temper and loves dynamite almost as much as speed."
+description:"Ex-cavalry rider turned motorcycle gunslinger. Loves speed, dust storms and dynamite."
 },
 
 {
 name:"Elias Black",
 nickname:"'Coyote'",
-description:"A lone-wolf tracker and bounty hunter. Speaks little, but his coyote companion does the talking with its howl. Expert in desert survival and silent takedowns."
+description:"A silent tracker whose legendary desert survival skills make him one of the most feared hunters in the frontier."
 }
 
 ];
 
-let current = 0;
-
-const name = document.getElementById("name");
-const nickname = document.getElementById("nickname");
-const description = document.getElementById("description");
-const dots = document.querySelectorAll(".dot");
+let currentCharacter = 0;
 
 function updateCharacter(){
 
-name.textContent = characters[current].name;
-nickname.textContent = characters[current].nickname;
-description.textContent = characters[current].description;
+document.getElementById("name").textContent =
+characters[currentCharacter].name;
 
-dots.forEach(dot => dot.classList.remove("active"));
-dots[current].classList.add("active");
+document.getElementById("nickname").textContent =
+characters[currentCharacter].nickname;
+
+document.getElementById("description").textContent =
+characters[currentCharacter].description;
 
 }
 
-document.getElementById("next").addEventListener("click", () => {
-current++;
-if(current >= characters.length){
-current = 0;
-}
-updateCharacter();
-});
-
-document.getElementById("prev").addEventListener("click", () => {
-current--;
-if(current < 0){
-current = characters.length - 1;
+function nextCharacter(){
+currentCharacter++;
+if(currentCharacter >= characters.length){
+currentCharacter = 0;
 }
 updateCharacter();
-});
+}
+
+function previousCharacter(){
+currentCharacter--;
+if(currentCharacter < 0){
+currentCharacter = characters.length - 1;
+}
+updateCharacter();
+}
 
 updateCharacter();
 
 </script>
-</section>
-
-<section class="footer">
-
-<h2>DESERTED OUTLAWS</h2>
-
-<p>COMING 2027</p>
-
-<a href="#" class="btn">WISHLIST SOON.</a>
-
-</section>
 
 </body>
 </html>
