@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Deserted Outlaws</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+scroll-behavior:smooth;
+}
+
+body{
+font-family:'Oswald',sans-serif;
+background:#000;
+color:white;
+overflow-x:hidden;
+}
+
+.hero{
+height:100vh;
+background:
+linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.7)),
+url('hero.jpg');
+background-size:cover;
+background-position:center;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+
+.hero-content img{
+width:500px;
+max-width:90%;
+margin-bottom:20px;
+}
+
+.hero h1{
+font-size:7rem;
+letter-spacing:8px;
+}
+
+.hero p{
+font-size:2rem;
+color:#f8c26b;
+margin:20px 0;
+}
+
+.btn{
+display:inline-block;
+padding:15px 35px;
+background:#f8c26b;
+color:black;
+text-decoration:none;
+font-weight:bold;
+margin:10px;
+border-radius:50px;
+transition:.3s;
+}
+
+.btn:hover{
+transform:scale(1.05);
+}
+
+.section-title{
+text-align:center;
+font-size:4rem;
+padding:100px 20px 50px;
+}
+
+.character{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:50px;
+gap:50px;
+background:#111;
+}
+
+.character:nth-child(even){
+background:#1a1a1a;
+}
+
+.character img{
+width:450px;
+max-width:100%;
+border-radius:20px;
+}
+
+.character-text{
+max-width:600px;
+}
+
+.character-text h2{
+font-size:4rem;
+color:#f8c26b;
+}
+
+.character-text h3{
+font-size:2rem;
+margin-bottom:20px;
+}
+
+.character-text p{
+font-size:1.2rem;
+line-height:1.8;
+}
+
+.world{
+padding:120px 10%;
+text-align:center;
+background:url('desert-bg.jpg');
+background-size:cover;
+background-position:center;
+}
+
+.world h2{
+font-size:5rem;
+margin-bottom:20px;
+}
+
+.world p{
+font-size:1.5rem;
+max-width:1000px;
+margin:auto;
+}
+
+.features{
+padding:120px 10%;
+background:black;
+}
+
+.feature-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+margin-top:50px;
+}
+
+.feature{
+background:#161616;
+padding:30px;
+border-radius:15px;
+}
+
+.feature h3{
+color:#f8c26b;
+margin-bottom:10px;
+}
+
+.gallery{
+padding:120px 5%;
+background:#111;
+}
+
+.gallery-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:15px;
+}
+
+.gallery-grid img{
+width:100%;
+height:300px;
+object-fit:cover;
+border-radius:15px;
+}
+
+.footer{
+height:60vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+flex-direction:column;
+background:linear-gradient(#111,#000);
+}
+
+.footer h2{
+font-size:5rem;
+}
+
+.footer p{
+font-size:2rem;
+color:#f8c26b;
+margin:20px 0;
+}
+
+@media(max-width:900px){
+
+.character{
+flex-direction:column;
+text-align:center;
+}
+
+.hero h1{
+font-size:4rem;
+}
+
+.section-title{
+font-size:3rem;
+}
+
+.character-text h2{
+font-size:3rem;
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<section class="hero">
+
+<div class="hero-content">
+
+<img src="logo.png" alt="Deserted Outlaws Logo">
+
+<h1>DESERTED OUTLAWS</h1>
+
+<p>COMING 2027</p>
+
+<a href="#" class="btn">WATCH TRAILER</a>
+<a href="#" class="btn">WISHLIST</a>
+
+</div>
+
+</section>
+
+<h1 class="section-title">MEET THE OUTLAWS</h1>
+
+<section class="character">
+
+<img src="lila.jpg">
+
+<div class="character-text">
+<h2>Lila Kane</h2>
+<h3>"Viper"</h3>
+
+<p>
+The deadliest bounty hunter in the badlands.
+Armed with dual revolvers and unmatched precision,
+Lila always stays one step ahead of both criminals
+and the law.
+</p>
+
+</div>
+
+</section>
+
+<section class="character">
+
+<img src="silas.jpg">
+
+<div class="character-text">
+<h2>Silas Crowe</h2>
+<h3>"Ghost"</h3>
+
+<p>
+Former sheriff turned outlaw king.
+Feared throughout the frontier, Silas commands
+respect with his rifle and ruthless leadership.
+</p>
+
+</div>
+
+</section>
+
+<section class="character">
+
+<img src="rosa.jpg">
+
+<div class="character-text">
+<h2>Rosa Delgado</h2>
+<h3>"Bandit Queen"</h3>
+
+<p>
+Stagecoach thief. Bank robber.
+Master manipulator.
+Every wanted poster tells a different story.
+</p>
+
+</div>
+
+</section>
+
+<section class="character">
+
+<img src="jax.jpg">
+
+<div class="character-text">
+<h2>Jax Ryder</h2>
+<h3>"Iron Horse"</h3>
+
+<p>
+An ex-cavalry rider who tears through the desert
+on a custom black chopper. Loves speed,
+explosives and chaos.
+</p>
+
+</div>
+
+</section>
+
+<section class="character">
+
+<img src="elias.jpg">
+
+<div class="character-text">
+<h2>Elias Black</h2>
+<h3>"Coyote"</h3>
+
+<p>
+A silent tracker whose coyote companion
+is often heard before he is seen.
+Master of survival and pursuit.
+</p>
+
+</div>
+
+</section>
+
+<section class="world">
+
+<h2>RED MESA COUNTY</h2>
+
+<p>
+
+Explore a vast frontier of forgotten towns,
+dust storms, train routes, outlaw hideouts,
+canyons, deserts and lawless settlements.
+
+</p>
+
+</section>
+
+<section class="features">
+
+<h1 class="section-title">FEATURES</h1>
+
+<div class="feature-grid">
+
+<div class="feature">
+<h3>Massive Open World</h3>
+<p>Explore deserts, canyons and frontier towns.</p>
+</div>
+
+<div class="feature">
+<h3>Train Robberies</h3>
+<p>Stop and raid moving steam locomotives.</p>
+</div>
+
+<div class="feature">
+<h3>Bounty Hunting</h3>
+<p>Track criminals across the badlands.</p>
+</div>
+
+<div class="feature">
+<h3>Dynamic Wanted System</h3>
+<p>Your actions shape your reputation.</p>
+</div>
+
+<div class="feature">
+<h3>Online Multiplayer</h3>
+<p>Form posses and dominate the frontier.</p>
+</div>
+
+<div class="feature">
+<h3>Frontier Survival</h3>
+<p>Manage supplies and survive the wilderness.</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="gallery">
+
+<h1 class="section-title">GALLERY</h1>
+
+<div class="gallery-grid">
+
+<img src="gallery1.jpg">
+<img src="gallery2.jpg">
+<img src="gallery3.jpg">
+<img src="gallery4.jpg">
+<img src="gallery5.jpg">
+<img src="gallery6.jpg">
+
+</div>
+
+</section>
+
+<section class="footer">
+
+<h2>DESERTED OUTLAWS</h2>
+
+<p>COMING 2027</p>
+
+<a href="#" class="btn">WISHLIST NOW</a>
+
+</section>
+
+</body>
+</html>
