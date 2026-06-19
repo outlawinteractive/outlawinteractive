@@ -236,170 +236,189 @@ font-size:3rem;
 
 </div>
 
-</section>
+<section class="characters">
 
-<h1 class="section-title">MEET THE OUTLAWS</h1>
+<h1>MEET THE OUTLAWS</h1>
 
-<section class="character">
+<div class="slider">
 
-<img src="lila.jpg">
+<button id="prev">&#10094;</button>
 
-<div class="character-text">
-<h2>Lila Kane</h2>
-<h3>"Viper"</h3>
+<div class="slide-content">
+<h2 id="name"></h2>
+<h3 id="nickname"></h3>
+<p id="description"></p>
+</div>
 
-<p>
-The deadliest bounty hunter in the badlands.
-Armed with dual revolvers and unmatched precision,
-Lila always stays one step ahead of both criminals
-and the law.
-</p>
+<button id="next">&#10095;</button>
 
+</div>
+
+<div class="dots">
+<span class="dot active"></span>
+<span class="dot"></span>
+<span class="dot"></span>
+<span class="dot"></span>
+<span class="dot"></span>
 </div>
 
 </section>
 
-<section class="character">
+<style>
 
-<img src="silas.jpg">
+.characters{
+padding:120px 20px;
+background:#111;
+text-align:center;
+color:white;
+font-family:Arial,sans-serif;
+}
 
-<div class="character-text">
-<h2>Silas Crowe</h2>
-<h3>"Ghost"</h3>
+.characters h1{
+font-size:4rem;
+margin-bottom:60px;
+color:#f8c26b;
+letter-spacing:3px;
+}
 
-<p>
-Former sheriff turned outlaw king.
-Feared throughout the frontier, Silas commands
-respect with his rifle and ruthless leadership.
-</p>
+.slider{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:40px;
+max-width:1200px;
+margin:auto;
+}
 
-</div>
+.slide-content{
+max-width:800px;
+padding:40px;
+background:#1b1b1b;
+border-radius:20px;
+border:2px solid #f8c26b;
+}
 
-</section>
+.slide-content h2{
+font-size:3rem;
+margin-bottom:10px;
+color:#f8c26b;
+}
 
-<section class="character">
+.slide-content h3{
+font-size:1.8rem;
+margin-bottom:25px;
+}
 
-<img src="rosa.jpg">
+.slide-content p{
+font-size:1.2rem;
+line-height:1.8;
+}
 
-<div class="character-text">
-<h2>Rosa Delgado</h2>
-<h3>"Bandit Queen"</h3>
+.slider button{
+background:none;
+border:none;
+font-size:4rem;
+color:#f8c26b;
+cursor:pointer;
+transition:0.3s;
+}
 
-<p>
-Stagecoach thief. Bank robber.
-Master manipulator.
-Every wanted poster tells a different story.
-</p>
+.slider button:hover{
+transform:scale(1.2);
+}
 
-</div>
+.dots{
+margin-top:40px;
+}
 
-</section>
+.dot{
+height:14px;
+width:14px;
+background:#444;
+display:inline-block;
+border-radius:50%;
+margin:0 6px;
+}
 
-<section class="character">
+.dot.active{
+background:#f8c26b;
+}
 
-<img src="jax.jpg">
+</style>
 
-<div class="character-text">
-<h2>Jax Ryder</h2>
-<h3>"Iron Horse"</h3>
+<script>
 
-<p>
-An ex-cavalry rider who tears through the desert
-on a custom black chopper. Loves speed,
-explosives and chaos.
-</p>
+const characters = [
 
-</div>
+{
+name:"Lila Kane",
+nickname:"'Viper'",
+description:"The central gunslinger. A sharp-tongued, deadly accurate bounty hunter with a mysterious past. Wields dual revolvers and never misses. Cool, confident, and always one step ahead of the law."
+},
 
-</section>
+{
+name:"Silas Crowe",
+nickname:"'Ghost'",
+description:"A hardened, scarred outlaw leader. Former sheriff turned renegade. Carries a lever-action rifle and a grudge the size of the desert. Quiet, ruthless, and respected — and feared — by every gang in the badlands."
+},
 
-<section class="character">
+{
+name:"Rosa Delgado",
+nickname:"'Bandit Queen'",
+description:"A charismatic blonde outlaw known for robbing stagecoaches and banks. Clever, seductive, and fast with a knife or pistol. Always seems to have a wanted poster in her hand — sometimes her own."
+},
 
-<img src="elias.jpg">
+{
+name:"Jax Ryder",
+nickname:"'Iron Horse'",
+description:"A wild ex-cavalry rider turned motorcycle gunslinger. Rides a customized black desert chopper through dust storms. Explosive temper and loves dynamite almost as much as speed."
+},
 
-<div class="character-text">
-<h2>Elias Black</h2>
-<h3>"Coyote"</h3>
+{
+name:"Elias Black",
+nickname:"'Coyote'",
+description:"A lone-wolf tracker and bounty hunter. Speaks little, but his coyote companion does the talking with its howl. Expert in desert survival and silent takedowns."
+}
 
-<p>
-A silent tracker whose coyote companion
-is often heard before he is seen.
-Master of survival and pursuit.
-</p>
+];
 
-</div>
+let current = 0;
 
-</section>
+const name = document.getElementById("name");
+const nickname = document.getElementById("nickname");
+const description = document.getElementById("description");
+const dots = document.querySelectorAll(".dot");
 
-<section class="world">
+function updateCharacter(){
 
-<h2>RED MESA COUNTY</h2>
+name.textContent = characters[current].name;
+nickname.textContent = characters[current].nickname;
+description.textContent = characters[current].description;
 
-<p>
+dots.forEach(dot => dot.classList.remove("active"));
+dots[current].classList.add("active");
 
-Explore a vast frontier of forgotten towns,
-dust storms, train routes, outlaw hideouts,
-canyons, deserts and lawless settlements.
+}
 
-</p>
+document.getElementById("next").addEventListener("click", () => {
+current++;
+if(current >= characters.length){
+current = 0;
+}
+updateCharacter();
+});
 
-</section>
+document.getElementById("prev").addEventListener("click", () => {
+current--;
+if(current < 0){
+current = characters.length - 1;
+}
+updateCharacter();
+});
 
-<section class="features">
+updateCharacter();
 
-<h1 class="section-title">FEATURES</h1>
-
-<div class="feature-grid">
-
-<div class="feature">
-<h3>Massive Open World</h3>
-<p>Explore deserts, canyons and frontier towns.</p>
-</div>
-
-<div class="feature">
-<h3>Train Robberies</h3>
-<p>Stop and raid moving steam locomotives.</p>
-</div>
-
-<div class="feature">
-<h3>Bounty Hunting</h3>
-<p>Track criminals across the badlands.</p>
-</div>
-
-<div class="feature">
-<h3>Dynamic Wanted System</h3>
-<p>Your actions shape your reputation.</p>
-</div>
-
-<div class="feature">
-<h3>Online Multiplayer</h3>
-<p>Form posses and dominate the frontier.</p>
-</div>
-
-<div class="feature">
-<h3>Frontier Survival</h3>
-<p>Manage supplies and survive the wilderness.</p>
-</div>
-
-</div>
-
-</section>
-
-<section class="gallery">
-
-<h1 class="section-title">GALLERY</h1>
-
-<div class="gallery-grid">
-
-<img src="gallery1.jpg">
-<img src="gallery2.jpg">
-<img src="gallery3.jpg">
-<img src="gallery4.jpg">
-<img src="gallery5.jpg">
-<img src="gallery6.jpg">
-
-</div>
-
+</script>
 </section>
 
 <section class="footer">
@@ -408,7 +427,7 @@ canyons, deserts and lawless settlements.
 
 <p>COMING 2027</p>
 
-<a href="#" class="btn">WISHLIST NOW</a>
+<a href="#" class="btn">WISHLIST SOON.</a>
 
 </section>
 
