@@ -11,23 +11,19 @@
       background: #1a0f05;
       color: #f5d5a0;
       font-family: 'Courier New', monospace;
-      overflow-x: hidden;
     }
-
     .header {
       text-align: center;
-      padding: 40px 20px;
+      padding: 50px 20px;
       background: linear-gradient(to bottom, #3a2a1f, #1a0f05);
       border-bottom: 4px solid #d4a017;
     }
-
     .header h1 {
-      font-size: 3.5em;
+      font-size: 3.8em;
       text-transform: uppercase;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px #d4a017;
+      letter-spacing: 6px;
+      color: #ffd700;
     }
-
     .guns-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
@@ -36,129 +32,92 @@
       max-width: 1400px;
       margin: 0 auto;
     }
-
     .gun-card {
       background: #2a1f14;
       border: 3px solid #d4a017;
       border-radius: 8px;
       overflow: hidden;
-      transition: all 0.4s ease;
-      position: relative;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      transition: all 0.4s;
     }
-
     .gun-card:hover {
-      transform: scale(1.08) rotate(2deg);
+      transform: scale(1.08);
       box-shadow: 0 0 40px #d4a017;
-      border-color: #ffd700;
     }
-
     .gun-image {
       width: 100%;
       height: 280px;
       object-fit: contain;
       background: #111;
       padding: 20px;
-      transition: all 0.5s;
     }
-
-    .gun-card:hover .gun-image {
-      transform: scale(1.15);
-    }
-
     .gun-info {
       padding: 20px;
       text-align: center;
     }
-
     .gun-name {
-      font-size: 1.8em;
+      font-size: 1.9em;
       color: #ffd700;
       margin: 10px 0;
-      text-shadow: 0 0 10px #d4a017;
     }
-
     .gun-desc {
       color: #e0c090;
-      line-height: 1.5;
-    }
-
-    .tag {
-      display: inline-block;
-      background: #3a2a1f;
-      color: #d4a017;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.9em;
-      margin-top: 10px;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>ARSENAL</h1>
-    <p style="font-size:1.3em; margin-top:10px;">Deserted Outlaws — Weapons of the Wasteland</p>
+    <h1>THE ARSENAL</h1>
+    <p>Weapons of the Wasteland</p>
   </div>
 
   <div class="guns-grid">
-    <!-- Gun 1 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/p3qXC" class="gun-image" alt="The Viper">
+      <img src="images/viper.jpg" class="gun-image" alt="The Viper">
       <div class="gun-info">
         <div class="gun-name">THE VIPER</div>
-        <p class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Fast, deadly, and engraved with silver snakes.</p>
-        <span class="tag">Dual Wield • High Accuracy</span>
+        <p class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Fast, accurate, and deadly.</p>
       </div>
     </div>
 
-    <!-- Gun 2 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/b0yqz" class="gun-image" alt="Ghostmaker">
+      <img src="images/ghostmaker.jpg" class="gun-image" alt="Ghostmaker">
       <div class="gun-info">
         <div class="gun-name">GHOSTMAKER</div>
-        <p class="gun-desc">Lever-action rifle of Silas "Ghost" Crowe. Built for long-range justice in the desert.</p>
-        <span class="tag">Long Range • Lever Action</span>
+        <p class="gun-desc">Lever-action rifle of Silas "Ghost" Crowe. Built for long range desert justice.</p>
       </div>
     </div>
 
-    <!-- Gun 3 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/QIye5" class="gun-image" alt="Bandit Queen">
+      <img src="images/bandit-queen.jpg" class="gun-image" alt="Bandit Queen">
       <div class="gun-info">
         <div class="gun-name">BANDIT QUEEN</div>
-        <p class="gun-desc">Sawed-off shotgun favored by Rosa Delgado. Close range devastation with style.</p>
-        <span class="tag">Close Range • High Damage</span>
+        <p class="gun-desc">Sawed-off shotgun favored by Rosa Delgado. Close range destruction.</p>
       </div>
     </div>
 
-    <!-- Gun 4 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/o8EXh" class="gun-image" alt="Iron Horse">
+      <img src="images/iron-horse.jpg" class="gun-image" alt="Iron Horse">
       <div class="gun-info">
         <div class="gun-name">IRON HORSE</div>
-        <p class="gun-desc">Heavy revolver used by Jax "Iron Horse" Ryder. Brutal stopping power.</p>
-        <span class="tag">Heavy • Reliable</span>
+        <p class="gun-desc">Heavy revolver used by Jax Ryder. Maximum stopping power.</p>
       </div>
     </div>
 
-    <!-- Gun 5 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/6RK4M" class="gun-image" alt="Coyote's Bite">
+      <img src="images/coyotes-bite.jpg" class="gun-image" alt="Coyote's Bite">
       <div class="gun-info">
         <div class="gun-name">COYOTE'S BITE</div>
-        <p class="gun-desc">Precision sniper rifle of Elias "Coyote" Black. Silent death from afar.</p>
-        <span class="tag">Sniper • Stealth</span>
+        <p class="gun-desc">Precision sniper rifle of Elias "Coyote" Black.</p>
       </div>
     </div>
 
-    <!-- Gun 6 -->
     <div class="gun-card">
-      <img src="https://grok.x.ai/image/G3nZl" class="gun-image" alt="Hellfire">
+      <img src="images/hellfire.jpg" class="gun-image" alt="Hellfire">
       <div class="gun-info">
         <div class="gun-name">HELLFIRE</div>
-        <p class="gun-desc">Rare lever-action repeating pistol. Unleashes hell with every trigger pull.</p>
-        <span class="tag">High Fire Rate • Legendary</span>
+        <p class="gun-desc">Rare lever-action repeating pistol. Unleashes hell with every pull.</p>
       </div>
     </div>
   </div>
