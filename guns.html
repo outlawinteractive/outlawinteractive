@@ -25,19 +25,20 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 2s ease;
+      transition: opacity 2.5s ease;
     }
     .oi-logo {
       font-family: 'Playfair Display', serif;
-      font-size: 7em;
+      font-size: 7.2em;
       color: #d4a017;
-      letter-spacing: 15px;
+      letter-spacing: 18px;
     }
     .loading-bar {
-      width: 420px;
-      height: 6px;
+      width: 460px;
+      height: 8px;
       background: #3a2a1f;
-      margin-top: 30px;
+      margin-top: 40px;
+      border-radius: 4px;
       position: relative;
       overflow: hidden;
     }
@@ -45,29 +46,27 @@
       content: '';
       position: absolute;
       top: 0; left: -100%;
-      width: 40%;
+      width: 45%;
       height: 100%;
       background: linear-gradient(90deg, transparent, #fff, transparent);
-      animation: streak 2.5s linear infinite;
+      animation: streak 3s linear infinite;
     }
-    @keyframes streak {
-      0% { left: -100%; }
-      100% { left: 300%; }
-    }
+    @keyframes streak { 0% { left: -100%; } 100% { left: 300%; } }
 
     /* Navigation */
     nav {
       position: fixed;
-      top: 20px;
+      top: 25px;
       left: 40px;
       z-index: 1000;
     }
     nav a {
       color: #d4a017;
       text-decoration: none;
-      font-size: 1.3em;
-      padding: 10px 20px;
-      border: 2px solid #8b5a00;
+      font-size: 1.35em;
+      padding: 12px 28px;
+      border: 3px solid #8b5a00;
+      border-radius: 8px;
       transition: 0.4s;
     }
     nav a:hover {
@@ -77,43 +76,41 @@
 
     /* Header */
     .header {
-      padding: 180px 40px 100px;
+      padding: 200px 40px 120px;
       text-align: center;
       border-bottom: 6px solid #8b5a00;
     }
     .header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 5.5em;
+      font-size: 5.8em;
       color: #d4a017;
     }
 
-    /* Guns Grid */
+    /* Guns */
     .guns-container {
-      padding: 80px 40px;
-      max-width: 1400px;
+      padding: 60px 40px;
+      max-width: 1300px;
       margin: 0 auto;
     }
     .gun-card {
       background: #1f160d;
       border: 3px solid #8b5a00;
-      margin-bottom: 60px;
-      padding: 40px;
-      transition: all 0.6s ease;
-    }
-    .gun-card:hover {
-      border-color: #ffd700;
-      transform: translateY(-10px);
+      border-radius: 20px; /* Rounded corners */
+      margin-bottom: 90px;
+      padding: 50px 45px;
+      opacity: 1;
+      transition: all 1.2s ease;
     }
     .gun-name {
       font-family: 'Playfair Display', serif;
-      font-size: 3em;
+      font-size: 3.2em;
       color: #ffd700;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     .gun-desc {
-      font-size: 1.35em;
-      line-height: 1.8;
-      max-width: 800px;
+      font-size: 1.45em;
+      line-height: 1.9;
+      max-width: 850px;
     }
   </style>
 </head>
@@ -127,54 +124,65 @@
 
   <!-- NAV -->
   <nav>
-    <a href="index.html">← BACK TO HOME</a>
+    <a href="index.html">← RETURN TO DESERT</a>
   </nav>
 
   <!-- HEADER -->
   <div class="header">
     <h1>THE ARSENAL</h1>
-    <p style="font-size:1.6em; margin-top:20px;">Weapons of Legend from the Desert Wasteland</p>
+    <p style="font-size:1.7em; margin-top:25px;">Weapons forged in blood and desert sand</p>
   </div>
 
   <!-- GUNS -->
   <div class="guns-container">
     <div class="gun-card">
       <div class="gun-name">THE VIPER</div>
-      <div class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Fast-draw, silver snake engravings, and unmatched accuracy in the hands of a true gunslinger.</div>
+      <div class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Lightning fast, silver snake engravings, and deadly precision.</div>
     </div>
 
     <div class="gun-card">
       <div class="gun-name">GHOSTMAKER</div>
-      <div class="gun-desc">Lever-action rifle carried by Silas "Ghost" Crowe. Long range, battle-worn, and deadly precise across the open desert.</div>
+      <div class="gun-desc">Lever-action rifle of Silas "Ghost" Crowe. Battle-scarred and built for long-range vengeance across the dunes.</div>
     </div>
 
     <div class="gun-card">
       <div class="gun-name">BANDIT QUEEN</div>
-      <div class="gun-desc">Sawed-off shotgun favored by Rosa Delgado. Brutal at close range, engraved with roses, and built for chaos.</div>
+      <div class="gun-desc">Sawed-off shotgun of Rosa Delgado. Close-range terror with engraved roses and raw power.</div>
     </div>
 
     <div class="gun-card">
       <div class="gun-name">IRON HORSE</div>
-      <div class="gun-desc">Heavy revolver of Jax "Iron Horse" Ryder. Massive stopping power for those who ride into battle on thunder.</div>
+      <div class="gun-desc">Heavy revolver of Jax "Iron Horse" Ryder. Brutal stopping power for the rider who fears nothing.</div>
     </div>
 
     <div class="gun-card">
       <div class="gun-name">COYOTE'S BITE</div>
-      <div class="gun-desc">Precision bolt-action sniper rifle used by Elias "Coyote" Black. Silent. Deadly. Perfect for desert shadows.</div>
+      <div class="gun-desc">Precision sniper rifle of Elias "Coyote" Black. Silent death from the desert shadows.</div>
     </div>
 
     <div class="gun-card">
       <div class="gun-name">HELLFIRE</div>
-      <div class="gun-desc">Rare lever-action repeating pistol. Brass body with flame engravings. Unleashes pure hell with every trigger pull.</div>
+      <div class="gun-desc">Rare lever-action repeating pistol. Brass and flame engravings. Pure chaos in every shot.</div>
     </div>
   </div>
 
   <script>
-    // Loading screen
+    // Longer loading
     setTimeout(() => {
       document.getElementById('loading').style.opacity = '0';
-      setTimeout(() => document.getElementById('loading').style.display = 'none', 1800);
-    }, 3200);
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+      }, 2200);
+    }, 4500);
+
+    // Scroll fade effect
+    window.addEventListener('scroll', () => {
+      document.querySelectorAll('.gun-card').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const opacity = Math.max(0.15, 1 - (window.scrollY - card.offsetTop + 400) / 800);
+        card.style.opacity = opacity;
+      });
+    });
   </script>
 </body>
 </html>
