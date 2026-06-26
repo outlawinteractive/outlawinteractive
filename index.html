@@ -1,448 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deserted Outlaws</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deserted Outlaws</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0f0a05;
+      color: #f5d5a0;
+      font-family: 'Courier New', monospace;
+      overflow-x: hidden;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url('images/hero-bg.jpg') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .hero-content h1 {
+      font-size: 5.5em;
+      text-transform: uppercase;
+      letter-spacing: 8px;
+      color: #ffd700;
+      text-shadow: 0 0 30px #d4a017;
+    }
+    .hero-content p {
+      font-size: 1.6em;
+      margin: 20px 0 40px;
+    }
+    .btn {
+      padding: 18px 60px;
+      background: transparent;
+      border: 3px solid #d4a017;
+      color: #ffd700;
+      font-size: 1.4em;
+      cursor: pointer;
+      transition: 0.4s;
+    }
+    .btn:hover {
+      background: #d4a017;
+      color: #1a0f05;
+    }
 
-<style>
+    /* Characters Carousel */
+    .characters {
+      padding: 80px 40px;
+      background: #1a0f05;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 3em;
+      color: #ffd700;
+      margin-bottom: 50px;
+      text-transform: uppercase;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 30px;
+      padding: 20px;
+      scroll-behavior: smooth;
+    }
+    .char-card {
+      min-width: 320px;
+      background: #2a1f14;
+      border: 3px solid #d4a017;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: 0.4s;
+    }
+    .char-card:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 40px #d4a017;
+    }
+    .char-card img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+    }
+    .char-info {
+      padding: 20px;
+      text-align: center;
+    }
+    .char-name {
+      font-size: 2em;
+      color: #ffd700;
+    }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-scroll-behavior:smooth;
-}
-
-body{
-background:#050505;
-color:white;
-font-family:Inter,sans-serif;
-overflow-x:hidden;
-}
-
-.hero{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-background:
-linear-gradient(to bottom,
-rgba(0,0,0,.4),
-rgba(0,0,0,.85)),
-url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80');
-background-size:cover;
-background-position:center;
-}
-
-.hero-content h1{
-font-family:Cinzel,serif;
-font-size:clamp(4rem,10vw,9rem);
-line-height:0.9;
-letter-spacing:5px;
-}
-
-.hero-content p{
-font-size:1.4rem;
-margin:20px 0;
-color:#D9A441;
-}
-
-.button{
-display:inline-block;
-padding:15px 35px;
-background:#D9A441;
-color:black;
-text-decoration:none;
-font-weight:bold;
-border-radius:40px;
-margin-top:20px;
-}
-
-.ticker{
-background:#D9A441;
-color:black;
-padding:15px;
-font-weight:700;
-white-space:nowrap;
-overflow:hidden;
-}
-
-.ticker span{
-display:inline-block;
-padding-left:100%;
-animation:scroll 20s linear infinite;
-}
-
-@keyframes scroll{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
-}
-
-.section{
-padding:120px 10%;
-}
-
-.title{
-font-family:Cinzel;
-font-size:3rem;
-margin-bottom:50px;
-text-align:center;
-color:#D9A441;
-}
-
-.character-box{
-max-width:900px;
-margin:auto;
-background:#111;
-padding:40px;
-border:1px solid #333;
-border-radius:20px;
-text-align:center;
-}
-
-.character-box h2{
-font-family:Cinzel;
-font-size:3rem;
-}
-
-.character-box h3{
-color:#D9A441;
-margin:10px 0 25px;
-}
-
-.character-box p{
-line-height:1.8;
-font-size:1.1rem;
-}
-
-.controls{
-margin-top:30px;
-}
-
-.controls button{
-background:#D9A441;
-border:none;
-padding:12px 25px;
-margin:0 10px;
-cursor:pointer;
-font-weight:bold;
-border-radius:8px;
-}
-
-.map{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.location{
-background:#111;
-padding:30px;
-border-radius:15px;
-border:1px solid #333;
-}
-
-.location h3{
-color:#D9A441;
-margin-bottom:10px;
-}
-
-.features{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.feature{
-background:#111;
-padding:30px;
-border-radius:15px;
-border-left:5px solid #D9A441;
-}
-
-.feature h3{
-margin-bottom:10px;
-color:#D9A441;
-}
-
-.quote{
-height:60vh;
-display:flex;
-justify-content:center;
-align-items:center;
-text-align:center;
-font-family:Cinzel;
-font-size:2.5rem;
-padding:40px;
-background:#0a0a0a;
-}
-
-.footer{
-padding:120px 20px;
-text-align:center;
-background:black;
-}
-
-.footer h1{
-font-family:Cinzel;
-font-size:5rem;
-line-height:0.9;
-}
-
-.footer p{
-font-size:2rem;
-margin-top:20px;
-color:#D9A441;
-}
-
-</style>
+    /* Arsenal Teaser */
+    .arsenal-teaser {
+      padding: 80px 40px;
+      background: #3a2a1f;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Arsenal Section -->
-<section id="arsenal" style="padding: 80px 20px; background: linear-gradient(to bottom, #1a0f05, #3a2a1f); text-align: center; border-top: 4px solid #d4a017;">
-  <div style="max-width: 1100px; margin: 0 auto;">
-    <h2 style="font-size: 3em; color: #ffd700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px;">
-      THE ARSENAL
-    </h2>
-    <p style="font-size: 1.4em; color: #e0c090; max-width: 700px; margin: 0 auto 40px;">
-      Arm yourself with the deadliest weapons of the desert wasteland.
-    </p>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>DESERTED OUTLAWS</h1>
+      <p>Raise Hell in the Wasteland</p>
+      <button class="btn" onclick="window.location.href='guns.html'">ENTER THE BADLANDS</button>
+    </div>
+  </section>
 
-    <a href="guns.html" style="display: inline-block; padding: 18px 50px; background: #3a2a1f; color: #ffd700; font-size: 1.5em; font-weight: bold; text-decoration: none; border: 3px solid #d4a017; border-radius: 8px; transition: all 0.3s ease;">
-      VIEW ALL WEAPONS
-    </a>
-
-    <div style="margin-top: 50px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
-      <!-- Preview cards -->
-      <div onclick="window.location.href='guns.html'" style="cursor: pointer; width: 220px; text-align: center;">
-        <img src="https://grok.x.ai/image/p3qXC" style="width: 100%; height: 140px; object-fit: contain; border: 2px solid #d4a017;">
-        <p style="margin-top: 10px; color: #ffd700;">THE VIPER</p>
+  <!-- CHARACTERS -->
+  <section class="characters">
+    <h2 class="section-title">THE OUTLAWS</h2>
+    <div class="carousel">
+      <div class="char-card">
+        <img src="images/lila-viper.jpg" alt="Lila Kane">
+        <div class="char-info">
+          <div class="char-name">LILA "VIPER" KANE</div>
+          <p>Dual-wielding gunslinger. Fast. Deadly. Unforgettable.</p>
+        </div>
       </div>
-      <div onclick="window.location.href='guns.html'" style="cursor: pointer; width: 220px; text-align: center;">
-        <img src="https://grok.x.ai/image/b0yqz" style="width: 100%; height: 140px; object-fit: contain; border: 2px solid #d4a017;">
-        <p style="margin-top: 10px; color: #ffd700;">GHOSTMAKER</p>
+      <div class="char-card">
+        <img src="images/silas-crowe.jpg" alt="Silas Crowe">
+        <div class="char-info">
+          <div class="char-name">SILAS "GHOST" CROWE</div>
+          <p>Former sheriff. Cold-blooded outlaw leader.</p>
+        </div>
       </div>
-      <div onclick="window.location.href='guns.html'" style="cursor: pointer; width: 220px; text-align: center;">
-        <img src="https://grok.x.ai/image/QIye5" style="width: 100%; height: 140px; object-fit: contain; border: 2px solid #d4a017;">
-        <p style="margin-top: 10px; color: #ffd700;">BANDIT QUEEN</p>
+      <div class="char-card">
+        <img src="images/rosa-delgado.jpg" alt="Rosa Delgado">
+        <div class="char-info">
+          <div class="char-name">ROSA "BANDIT QUEEN" DELGADO</div>
+          <p>Charismatic bank robber and outlaw.</p>
+        </div>
+      </div>
+      <div class="char-card">
+        <img src="images/jax-ryder.jpg" alt="Jax Ryder">
+        <div class="char-info">
+          <div class="char-name">JAX "IRON HORSE" RYDER</div>
+          <p>Motorcycle gunslinger. Chaos on wheels.</p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-
-  
-<section class="hero">
-<div class="hero-content">
-<h1>DESERTED<br>OUTLAWS</h1>
-<p>The Frontier Belongs To Nobody.</p>
-<a href="#" class="button">COMING 2027</a>
-</div>
-</section>
-
-<div class="ticker">
-<span>
-ICE CREAM • 2027 • WISHLIST SOON • COMING 2027 •
-</span>
-</div>
-
-<section class="section">
-
-<h1 class="title">MEET THE OUTLAWS</h1>
-
-<div class="character-box">
-
-<h2 id="name"></h2>
-<h3 id="nickname"></h3>
-<p id="description"></p>
-
-<div class="controls">
-<button onclick="previousCharacter()">◀ Previous</button>
-<button onclick="nextCharacter()">Next ▶</button>
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<h1 class="title">THE BADLANDS</h1>
-
-<div class="map">
-
-<div class="location">
-<h3>Dustfall Ridge</h3>
-<p>A canyon region battered by endless storms.</p>
-</div>
-
-<div class="location">
-<h3>Blackwater Mine</h3>
-<p>An abandoned mine filled with secrets.</p>
-</div>
-
-<div class="location">
-<h3>Coyote Flats</h3>
-<p>Open desert territory ruled by bounty hunters.</p>
-</div>
-
-<div class="location">
-<h3>Saint Mercy</h3>
-<p>The last civilized town in Red Mesa County.</p>
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<h1 class="title">FEATURES</h1>
-
-<div class="features">
-
-<div class="feature">
-<h3>Open World Frontier</h3>
-<p>Explore deserts, towns and hidden outlaw camps.</p>
-</div>
-
-<div class="feature">
-<h3>Train Robberies</h3>
-<p>Raid moving trains across the badlands.</p>
-</div>
-
-<div class="feature">
-<h3>Bounty Hunting</h3>
-<p>Track criminals and collect rewards.</p>
-</div>
-
-<div class="feature">
-<h3>Dynamic Wanted System</h3>
-<p>Your reputation changes the world around you.</p>
-</div>
-
-<div class="feature">
-<h3>Survival</h3>
-<p>Manage supplies, camps and harsh weather.</p>
-</div>
-
-<div class="feature">
-<h3>Online Posses</h3>
-<p>Ride with friends and build your legend.</p>
-</div>
-
-</div>
-
-</section>
-
-<section class="quote">
-"The law ends where the desert begins."
-</section>
-
-<section class="footer">
-<h1>DESERTED<br>OUTLAWS</h1>
-<p>COMING 2027</p>
-</section>
-
-
-<section class="wishlist">
-
-<h2>FOLLOW DEVELOPMENT</h2>
-
-<p>
-Add Deserted Outlaws to your collection and follow development updates on itch.io.
-</p>
-
-<iframe frameborder="0"
-src="https://itch.io/embed/4694222?bg_color=000000&fg_color=ffffff&link_color=fab65b&border_color=ffffff"
-width="552"
-height="167">
-<a href="https://outlawinteractive.itch.io/deserted-outlaws">
-DESERTED OUTLAWS by Outlaw Interactive
-</a>
-</iframe>
-
-</section>
-  
-<script>
-
-const characters = [
-
-{
-name:"Lila Kane",
-nickname:"'Viper'",
-description:"The central gunslinger. A sharp-tongued, deadly accurate bounty hunter with a mysterious past. Wields dual revolvers and never misses."
-},
-
-{
-name:"Silas Crowe",
-nickname:"'Ghost'",
-description:"Former sheriff turned renegade. Carries a lever-action rifle and commands respect through fear and reputation."
-},
-
-{
-name:"Rosa Delgado",
-nickname:"'Bandit Queen'",
-description:"Charismatic outlaw famous for robbing banks and stagecoaches while always staying one step ahead."
-},
-
-{
-name:"Jax Ryder",
-nickname:"'Iron Horse'",
-description:"Ex-cavalry rider turned motorcycle gunslinger. Loves speed, dust storms and dynamite."
-},
-
-{
-name:"Elias Black",
-nickname:"'Coyote'",
-description:"A silent tracker whose legendary desert survival skills make him one of the most feared hunters in the frontier."
-}
-
-];
-
-let currentCharacter = 0;
-
-function updateCharacter(){
-
-document.getElementById("name").textContent =
-characters[currentCharacter].name;
-
-document.getElementById("nickname").textContent =
-characters[currentCharacter].nickname;
-
-document.getElementById("description").textContent =
-characters[currentCharacter].description;
-
-}
-
-function nextCharacter(){
-currentCharacter++;
-if(currentCharacter >= characters.length){
-currentCharacter = 0;
-}
-updateCharacter();
-}
-
-function previousCharacter(){
-currentCharacter--;
-if(currentCharacter < 0){
-currentCharacter = characters.length - 1;
-}
-updateCharacter();
-}
-
-updateCharacter();
-
-</script>
-
-<script src="https://api.dashboard.instatus.com/widget?host=outlawinteractive.instatus.com&code=92fee3c5&locale=en">
-</script>
+  <!-- ARSENAL TEASER -->
+  <section class="arsenal-teaser">
+    <h2 class="section-title">THE ARSENAL</h2>
+    <p style="font-size:1.4em; margin-bottom:40px;">Arm yourself for the desert war.</p>
+    <a href="guns.html" class="btn">VIEW ALL WEAPONS</a>
+  </section>
 
 </body>
 </html>
