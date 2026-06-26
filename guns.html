@@ -5,122 +5,176 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deserted Outlaws - Arsenal</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      margin: 0;
-      padding: 0;
-      background: #1a0f05;
-      color: #f5d5a0;
-      font-family: 'Courier New', monospace;
+      background: #0f0a05;
+      color: #e8d5a0;
+      font-family: 'Cinzel', serif;
     }
+
+    /* Loading Screen */
+    #loading {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #0f0a05;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 2s ease;
+    }
+    .oi-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 7em;
+      color: #d4a017;
+      letter-spacing: 15px;
+    }
+    .loading-bar {
+      width: 420px;
+      height: 6px;
+      background: #3a2a1f;
+      margin-top: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .loading-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      animation: streak 2.5s linear infinite;
+    }
+    @keyframes streak {
+      0% { left: -100%; }
+      100% { left: 300%; }
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 20px;
+      left: 40px;
+      z-index: 1000;
+    }
+    nav a {
+      color: #d4a017;
+      text-decoration: none;
+      font-size: 1.3em;
+      padding: 10px 20px;
+      border: 2px solid #8b5a00;
+      transition: 0.4s;
+    }
+    nav a:hover {
+      background: #d4a017;
+      color: #0f0a05;
+    }
+
+    /* Header */
     .header {
+      padding: 180px 40px 100px;
       text-align: center;
-      padding: 50px 20px;
-      background: linear-gradient(to bottom, #3a2a1f, #1a0f05);
-      border-bottom: 4px solid #d4a017;
+      border-bottom: 6px solid #8b5a00;
     }
     .header h1 {
-      font-size: 3.8em;
-      text-transform: uppercase;
-      letter-spacing: 6px;
-      color: #ffd700;
+      font-family: 'Playfair Display', serif;
+      font-size: 5.5em;
+      color: #d4a017;
     }
-    .guns-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 30px;
-      padding: 40px;
+
+    /* Guns Grid */
+    .guns-container {
+      padding: 80px 40px;
       max-width: 1400px;
       margin: 0 auto;
     }
     .gun-card {
-      background: #2a1f14;
-      border: 3px solid #d4a017;
-      border-radius: 8px;
-      overflow: hidden;
-      transition: all 0.4s;
+      background: #1f160d;
+      border: 3px solid #8b5a00;
+      margin-bottom: 60px;
+      padding: 40px;
+      transition: all 0.6s ease;
     }
     .gun-card:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 40px #d4a017;
-    }
-    .gun-image {
-      width: 100%;
-      height: 280px;
-      object-fit: contain;
-      background: #111;
-      padding: 20px;
-    }
-    .gun-info {
-      padding: 20px;
-      text-align: center;
+      border-color: #ffd700;
+      transform: translateY(-10px);
     }
     .gun-name {
-      font-size: 1.9em;
+      font-family: 'Playfair Display', serif;
+      font-size: 3em;
       color: #ffd700;
-      margin: 10px 0;
+      margin-bottom: 15px;
     }
     .gun-desc {
-      color: #e0c090;
-      line-height: 1.6;
+      font-size: 1.35em;
+      line-height: 1.8;
+      max-width: 800px;
     }
   </style>
 </head>
 <body>
 
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="oi-logo">OI</div>
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html">← BACK TO HOME</a>
+  </nav>
+
+  <!-- HEADER -->
   <div class="header">
     <h1>THE ARSENAL</h1>
-    <p>Weapons of the Wasteland</p>
+    <p style="font-size:1.6em; margin-top:20px;">Weapons of Legend from the Desert Wasteland</p>
   </div>
 
-  <div class="guns-grid">
+  <!-- GUNS -->
+  <div class="guns-container">
     <div class="gun-card">
-      <img src="images/viper.jpg" class="gun-image" alt="The Viper">
-      <div class="gun-info">
-        <div class="gun-name">THE VIPER</div>
-        <p class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Fast, accurate, and deadly.</p>
-      </div>
+      <div class="gun-name">THE VIPER</div>
+      <div class="gun-desc">Signature dual revolvers of Lila "Viper" Kane. Fast-draw, silver snake engravings, and unmatched accuracy in the hands of a true gunslinger.</div>
     </div>
 
     <div class="gun-card">
-      <img src="images/ghostmaker.jpg" class="gun-image" alt="Ghostmaker">
-      <div class="gun-info">
-        <div class="gun-name">GHOSTMAKER</div>
-        <p class="gun-desc">Lever-action rifle of Silas "Ghost" Crowe. Built for long range desert justice.</p>
-      </div>
+      <div class="gun-name">GHOSTMAKER</div>
+      <div class="gun-desc">Lever-action rifle carried by Silas "Ghost" Crowe. Long range, battle-worn, and deadly precise across the open desert.</div>
     </div>
 
     <div class="gun-card">
-      <img src="images/bandit-queen.jpg" class="gun-image" alt="Bandit Queen">
-      <div class="gun-info">
-        <div class="gun-name">BANDIT QUEEN</div>
-        <p class="gun-desc">Sawed-off shotgun favored by Rosa Delgado. Close range destruction.</p>
-      </div>
+      <div class="gun-name">BANDIT QUEEN</div>
+      <div class="gun-desc">Sawed-off shotgun favored by Rosa Delgado. Brutal at close range, engraved with roses, and built for chaos.</div>
     </div>
 
     <div class="gun-card">
-      <img src="images/iron-horse.jpg" class="gun-image" alt="Iron Horse">
-      <div class="gun-info">
-        <div class="gun-name">IRON HORSE</div>
-        <p class="gun-desc">Heavy revolver used by Jax Ryder. Maximum stopping power.</p>
-      </div>
+      <div class="gun-name">IRON HORSE</div>
+      <div class="gun-desc">Heavy revolver of Jax "Iron Horse" Ryder. Massive stopping power for those who ride into battle on thunder.</div>
     </div>
 
     <div class="gun-card">
-      <img src="images/coyotes-bite.jpg" class="gun-image" alt="Coyote's Bite">
-      <div class="gun-info">
-        <div class="gun-name">COYOTE'S BITE</div>
-        <p class="gun-desc">Precision sniper rifle of Elias "Coyote" Black.</p>
-      </div>
+      <div class="gun-name">COYOTE'S BITE</div>
+      <div class="gun-desc">Precision bolt-action sniper rifle used by Elias "Coyote" Black. Silent. Deadly. Perfect for desert shadows.</div>
     </div>
 
     <div class="gun-card">
-      <img src="images/hellfire.jpg" class="gun-image" alt="Hellfire">
-      <div class="gun-info">
-        <div class="gun-name">HELLFIRE</div>
-        <p class="gun-desc">Rare lever-action repeating pistol. Unleashes hell with every pull.</p>
-      </div>
+      <div class="gun-name">HELLFIRE</div>
+      <div class="gun-desc">Rare lever-action repeating pistol. Brass body with flame engravings. Unleashes pure hell with every trigger pull.</div>
     </div>
   </div>
 
+  <script>
+    // Loading screen
+    setTimeout(() => {
+      document.getElementById('loading').style.opacity = '0';
+      setTimeout(() => document.getElementById('loading').style.display = 'none', 1800);
+    }, 3200);
+  </script>
 </body>
 </html>
