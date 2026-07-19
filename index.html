@@ -76,6 +76,13 @@
   #armorBar { margin-top:9px; }
   #armorFill { background:linear-gradient(90deg,#50bdff,#bfeeff); }
   #weapon { margin-top:10px; font-weight:900; }
+  #weaponSlots { position:absolute; right:18px; bottom:22px; display:flex; gap:6px; align-items:flex-end; }
+  .weaponSlot { width:62px; min-height:54px; padding:6px 5px; border-radius:10px; text-align:center; background:rgba(7,10,20,.72); border:1px solid rgba(255,255,255,.12); opacity:.62; transition:.15s; }
+  .weaponSlot.active { opacity:1; transform:translateY(-5px); border-color:var(--cyan); box-shadow:0 0 18px rgba(84,232,255,.28); }
+  .weaponSlot.locked { opacity:.25; filter:grayscale(1); }
+  .weaponSlot b { display:block; color:var(--cyan); font-size:10px; }
+  .weaponSlot span { display:block; font-size:9px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .weaponSlot small { display:block; color:#b8c0d4; font-size:8px; margin-top:2px; }
   #speedometer { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); font-size:23px; font-weight:900; text-shadow:0 4px 14px #000; }
   #speedometer small { display:block; font-size:9px; letter-spacing:.2em; text-align:center; color:#aeb7cd; }
   #minimapFrame { position:absolute; left:18px; bottom:18px; width:190px; height:190px; border-radius:50%; padding:8px; overflow:hidden; }
@@ -115,7 +122,25 @@
   .toggleLine { display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .toggleLine input { width:20px; height:20px; }
   .settingsFooter { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
-  #helpPanel { position:fixed; z-index:40; right:18px; bottom:18px; width:min(360px,85vw); padding:17px; border-radius:18px; }
+  #helpPanel { position:fixed; z-index:40; right:18px; bottom:18px; width:min(390px,88vw); padding:17px; border-radius:18px; }
+  #fullMapScreen, #commercePanel { position:fixed; inset:0; z-index:80; display:grid; place-items:center; background:rgba(1,3,9,.94); padding:22px; }
+  .mapCard { width:min(1180px,96vw); height:min(820px,92vh); border-radius:24px; padding:18px; display:grid; grid-template-rows:auto 1fr auto; gap:12px; }
+  .mapHeader, .panelHeader { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .mapHeader h2, .panelHeader h2 { margin:0; font-size:28px; }
+  .mapControls { display:flex; gap:8px; flex-wrap:wrap; }
+  #worldMap { width:100%; height:100%; min-height:350px; border-radius:16px; background:#050813; border:1px solid rgba(255,255,255,.13); cursor:crosshair; }
+  .mapFooter { display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; color:#aeb7cc; font-size:12px; }
+  .mapLegend { display:flex; gap:14px; flex-wrap:wrap; }
+  .legendDot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; }
+  .commerceCard { width:min(850px,95vw); max-height:88vh; overflow:auto; border-radius:24px; padding:24px; }
+  #commerceDescription { color:#b9c2d6; line-height:1.5; margin:8px 0 18px; }
+  #commerceItems { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+  .storeItem { padding:15px; border-radius:15px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); }
+  .storeItem h3 { margin:0 0 7px; font-size:16px; }
+  .storeItem p { margin:0 0 11px; color:#aeb7cc; font-size:12px; line-height:1.45; min-height:35px; }
+  .storeItem .price { color:var(--gold); font-weight:900; margin-bottom:10px; }
+  .storeItem button { width:100%; pointer-events:auto; }
+  .ownedTag { color:var(--ok); font-weight:900; font-size:12px; }
   #helpPanel h3 { margin:0 0 10px; }
   #helpPanel p { color:#c6ccda; line-height:1.5; font-size:13px; margin:0; }
   @media (max-width:700px) {
@@ -124,6 +149,9 @@
     #topLeft { width:60vw; }
     #minimapFrame { width:145px; height:145px; }
     #healthWrap { bottom:125px; width:180px; }
+    #weaponSlots { right:8px; bottom:8px; transform:scale(.8); transform-origin:right bottom; }
+    .mapCard { padding:10px; height:96vh; }
+    .mapHeader h2 { font-size:21px; }
   }
 </style>
 </head>
@@ -141,7 +169,7 @@
       <button class="secondary" id="startSettingsBtn">Settings</button>
     </div>
     <div class="controlsHint">
-      <span><kbd>WASD</kbd> move</span><span><kbd>Shift</kbd> sprint</span><span><kbd>F</kbd> vehicle</span><span><kbd>E</kbd> interact</span><span><kbd>U</kbd> unstuck</span><span><kbd>Esc</kbd> pause</span>
+      <span><kbd>WASD</kbd> move</span><span><kbd>Shift</kbd> sprint</span><span><kbd>F</kbd> vehicle</span><span><kbd>E</kbd> interact</span><span><kbd>M</kbd> city map</span><span><kbd>1–6</kbd> weapons</span><span><kbd>U</kbd> unstuck</span><span><kbd>Esc</kbd> pause</span>
     </div>
   </div>
 </div>
@@ -170,6 +198,7 @@
     <div id="weapon">UNARMED</div>
   </div>
   <div id="speedometer" class="hidden">0<small>KM/H</small></div>
+  <div id="weaponSlots"></div>
   <div id="minimapFrame" class="glass"><canvas id="minimap" width="220" height="220"></canvas></div>
   <div id="crosshair" class="hidden"></div>
   <div id="prompt" class="glass"></div>
@@ -185,6 +214,7 @@
     <h2>Neon Dominion</h2>
     <div class="pauseButtons">
       <button class="primary" id="resumeBtn">Resume</button>
+      <button class="secondary" id="openMapBtn">Open City Map</button>
       <button class="secondary" id="pauseSettingsBtn">Settings</button>
       <button class="secondary" id="saveBtn">Save Game</button>
       <button class="dangerBtn" id="quitBtn">Quit to Title</button>
@@ -212,9 +242,29 @@
   </div>
 </div>
 
+
+<div id="fullMapScreen" class="hidden">
+  <div class="mapCard glass">
+    <div class="mapHeader">
+      <div><div class="eyebrow">Crown City navigation network</div><h2>City Map</h2></div>
+      <div class="mapControls"><button class="secondary" id="mapZoomOut">−</button><button class="secondary" id="mapCenter">Centre</button><button class="secondary" id="mapZoomIn">+</button><button class="primary" id="closeMapBtn">Close</button></div>
+    </div>
+    <canvas id="worldMap" width="1100" height="680"></canvas>
+    <div class="mapFooter"><div>Click anywhere to place a purple GPS waypoint. Right-click to clear it.</div><div class="mapLegend"><span><i class="legendDot" style="background:#54e8ff"></i>Mission</span><span><i class="legendDot" style="background:#ffd56a"></i>Story start</span><span><i class="legendDot" style="background:#ff5e68"></i>Gun store</span><span><i class="legendDot" style="background:#6affb0"></i>Property</span><span><i class="legendDot" style="background:#b56cff"></i>Waypoint</span></div></div>
+  </div>
+</div>
+
+<div id="commercePanel" class="hidden">
+  <div class="commerceCard glass">
+    <div class="panelHeader"><div><div class="eyebrow" id="commerceEyebrow">Crown City</div><h2 id="commerceTitle">Store</h2></div><button class="secondary" id="closeCommerceBtn">Close</button></div>
+    <div id="commerceDescription"></div>
+    <div id="commerceItems"></div>
+  </div>
+</div>
+
 <div id="helpPanel" class="glass hidden">
   <h3>First time in Crown City?</h3>
-  <p>Click the game to lock the mouse. Go to the cyan <b>M</b> marker and press <b>E</b>. Enter cars with <b>F</b>. Use <b>U</b> at any time to return safely to the nearest road.</p>
+  <p>Click the game to lock the mouse. Follow the cyan mission marker and press <b>E</b>. Enter cars with <b>F</b>, open the full city map with <b>M</b>, select weapons with <b>1–6</b>, and use <b>U</b> to return safely to a road.</p>
   <button id="closeHelp" class="secondary" style="margin-top:12px;pointer-events:auto">Got it</button>
 </div>
 
@@ -240,6 +290,17 @@ const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 const dist2D = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 const formatMoney = n => '$'+Math.max(0,Math.floor(n)).toString().padStart(6,'0');
 
+const WEAPONS = [
+  {slot:0,id:'fists',name:'Unarmed',short:'FISTS',price:0,damage:32,fireRate:.45,range:2.2,spread:0,pellets:1,clipSize:0,ammoPack:0,ammoPrice:0,heat:.7},
+  {slot:1,id:'pulse',name:'Nova Pulse Pistol',short:'PISTOL',price:350,damage:38,fireRate:.28,range:70,spread:.008,pellets:1,clipSize:12,ammoPack:36,ammoPrice:65,heat:.85},
+  {slot:2,id:'viper',name:'Viper Compact SMG',short:'SMG',price:1450,damage:20,fireRate:.085,range:62,spread:.023,pellets:1,clipSize:30,ammoPack:90,ammoPrice:180,heat:1.0},
+  {slot:3,id:'breaker',name:'Breaker Street Shotgun',short:'SHOTGUN',price:2100,damage:15,fireRate:.72,range:34,spread:.075,pellets:7,clipSize:6,ammoPack:24,ammoPrice:210,heat:1.15},
+  {slot:4,id:'sentinel',name:'Sentinel Carbine',short:'RIFLE',price:3900,damage:48,fireRate:.17,range:105,spread:.012,pellets:1,clipSize:20,ammoPack:60,ammoPrice:330,heat:1.2},
+  {slot:5,id:'ion',name:'Ion Heavy Launcher',short:'HEAVY',price:7200,damage:82,fireRate:1.05,range:85,spread:.018,pellets:1,clipSize:3,ammoPack:9,ammoPrice:650,heat:1.6}
+];
+function freshInventory(){const inv={};for(const w of WEAPONS)inv[w.id]={owned:w.slot===0||w.slot===1,mag:w.slot===1?12:0,reserve:w.slot===1?48:0};return inv;}
+function currentWeapon(){return WEAPONS[state.weapon]||WEAPONS[0];}
+
 function hash2(x,z,seed=9176){
   let h = (x*374761393 + z*668265263 + seed*1442695041) | 0;
   h = (h ^ (h >>> 13)) * 1274126177;
@@ -255,11 +316,11 @@ const DEFAULT_SETTINGS = {
 let settings = {...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem('nd_settings')||'{}')};
 
 const state = {
-  running:false, paused:false, title:true, dialog:false, pointer:false,
+  running:false, paused:false, title:true, dialog:false, pointer:false, mapOpen:false, commerceOpen:false, mapFromPause:false,
   time:20.25, health:100, armor:0, money:500, heat:0, heatTimer:0,
-  weapon:0, ammo:48, missionIndex:0, currentMission:null, missionStage:0,
+  weapon:0, ammo:48, inventory:freshInventory(), missionIndex:0, currentMission:null, missionStage:0,
   missionData:{}, inInterior:null, gameTime:0, lastSafe:{x:0,y:1,z:18},
-  choice:null, weather:'clear', weatherTimer:80, saveVersion:3
+  choice:null, weather:'clear', weatherTimer:80, saveVersion:5, ownedProperties:[], lootedBuildings:[], waypoint:null, propertyIncomeClock:0
 };
 
 const dom = {
@@ -267,8 +328,9 @@ const dom = {
   missionTitle:$('missionTitle'), missionObjective:$('missionObjective'), missionProgress:$('missionProgress'),
   wanted:$('wanted'), money:$('money'), district:$('district'), clock:$('clock'), healthFill:$('healthFill'),
   healthText:$('healthText'), armorFill:$('armorFill'), armorText:$('armorText'), weapon:$('weapon'),
-  speed:$('speedometer'), map:$('minimap'), crosshair:$('crosshair'), prompt:$('prompt'), toast:$('toast'),
-  banner:$('missionBanner'), dialogue:$('dialogue'), speaker:$('speaker'), dialogueText:$('dialogueText'), damage:$('damageFlash'), help:$('helpPanel')
+  speed:$('speedometer'), map:$('minimap'), crosshair:$('crosshair'), prompt:$('prompt'), toast:$('toast'), weaponSlots:$('weaponSlots'),
+  banner:$('missionBanner'), dialogue:$('dialogue'), speaker:$('speaker'), dialogueText:$('dialogueText'), damage:$('damageFlash'), help:$('helpPanel'),
+  fullMap:$('fullMapScreen'), worldMap:$('worldMap'), commerce:$('commercePanel'), commerceTitle:$('commerceTitle'), commerceDescription:$('commerceDescription'), commerceItems:$('commerceItems'), commerceEyebrow:$('commerceEyebrow')
 };
 
 // ---------------- Audio synthesiser ----------------
@@ -295,7 +357,7 @@ class AudioSystem {
 const audio = new AudioSystem();
 
 // ---------------- Renderer and scene ----------------
-let scene, camera, renderer, clock, world, player, traffic, pedestrians, missions, interiors, police, weather;
+let scene, camera, renderer, clock, world, player, traffic, pedestrians, missions, interiors, police, weather, commerce;
 let sun, hemi, sky, objectiveMarker, startMarker, raycaster;
 const keys = Object.create(null);
 const mouse = {dx:0,dy:0,down:false};
@@ -385,6 +447,20 @@ function createCharacterMesh(opts={}){
   return g;
 }
 
+function createHeldWeaponModel(slot){
+  const g=new THREE.Group();
+  const dark=new THREE.MeshStandardMaterial({color:0x141923,metalness:.65,roughness:.32});
+  const accent=new THREE.MeshStandardMaterial({color:slot===5?0xff9b46:slot===4?0x54e8ff:0x59677f,metalness:.5,roughness:.28,emissive:slot===5?0x6b2100:0x001821,emissiveIntensity:.28});
+  const lengths=[0,.7,1.05,1.15,1.35,1.55];const len=lengths[slot]||.7;
+  const body=new THREE.Mesh(new THREE.BoxGeometry(.16,.16,len),dark);body.position.z=len*.5;g.add(body);
+  const top=new THREE.Mesh(new THREE.BoxGeometry(.12,.1,len*.72),accent);top.position.set(0,.1,len*.47);g.add(top);
+  const grip=new THREE.Mesh(new THREE.BoxGeometry(.13,.36,.16),dark);grip.position.set(0,-.19,.18);grip.rotation.x=-.22;g.add(grip);
+  if(slot===3){const pump=new THREE.Mesh(new THREE.BoxGeometry(.22,.2,.36),accent);pump.position.z=.58;g.add(pump);}
+  if(slot>=4){const stock=new THREE.Mesh(new THREE.BoxGeometry(.18,.24,.42),dark);stock.position.z=-.14;g.add(stock);}
+  const muzzle=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.18,8),accent);muzzle.rotation.x=Math.PI/2;muzzle.position.z=len+.08;g.add(muzzle);
+  g.rotation.set(-Math.PI/2,0,0);g.position.set(.03,-.32,.02);g.visible=slot>0;return g;
+}
+
 // ---------------- Vehicle factory ----------------
 const carColors=[0xe83d63,0x3a91ff,0xffc54c,0x17b88a,0xe8e8ee,0x20242d,0xa75bf4,0xff7b37];
 function createCarMesh(opts={}){
@@ -405,7 +481,7 @@ function createCarMesh(opts={}){
 // ---------------- World generation ----------------
 class WorldManager {
   constructor(){
-    this.chunkSize=240; this.roadStep=48; this.roadWidth=14; this.chunks=new Map(); this.colliders=[]; this.special=[];
+    this.chunkSize=240; this.roadStep=48; this.roadWidth=14; this.chunks=new Map(); this.colliders=[]; this.special=[]; this.activeEntries=[];
     this.root=new THREE.Group();scene.add(this.root);this.specialRoot=new THREE.Group();scene.add(this.specialRoot);
     this.materials={
       road:new THREE.MeshStandardMaterial({map:roadTexture(),roughness:.92}),
@@ -435,7 +511,7 @@ class WorldManager {
     this.rebuildColliders(cx,cz);
   }
   createChunk(cx,cz){
-    const g=new THREE.Group();g.position.set(cx*this.chunkSize,0,cz*this.chunkSize);g.userData.dynamicColliders=[];
+    const g=new THREE.Group();g.position.set(cx*this.chunkSize,0,cz*this.chunkSize);g.userData.dynamicColliders=[];g.userData.entries=[];
     const biome=this.biomeAt(g.position.x,g.position.z);
     const groundMat=biome==='desert'?this.materials.sand:biome==='green'?this.materials.grass:new THREE.MeshStandardMaterial({color:biome==='coast'?0xc9b176:0x50545d,roughness:1});
     const ground=new THREE.Mesh(new THREE.PlaneGeometry(this.chunkSize,this.chunkSize),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;g.add(ground);
@@ -470,10 +546,21 @@ class WorldManager {
       const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.62,hRand(cx,cz,10,2,7),d*.62),new THREE.MeshStandardMaterial({color:0x262b3b,metalness:.25,roughness:.5}));
       crown.position.set(bx,h+.05+crown.geometry.parameters.height/2,bz);crown.castShadow=settings.shadows;g.add(crown);
     }
-    if(hRand(cx+ix,cz+iz,11)>.79){
-      const words=['NOVA','LUX','MIRAGE','CROWN','ORBIT','SOL','VANTA'];const text=pick(words);
-      const sm=new THREE.MeshBasicMaterial({map:signTexture(text,pick(['#54e8ff','#ff4fd8','#ffd56a','#69ff9d'])),transparent:true,side:THREE.DoubleSide});
+    const companyWords=['AURORA','MERIDIAN','VELVET','ASTER','CROWN','MIRAGE','ORBIT','NOVA','SOLACE','VANTA'];
+    const suffixes=['RESIDENCES','PLAZA','HOUSE','CENTRE','LOFTS','ARCADE','OFFICES','COURT'];
+    const name=companyWords[Math.floor(hRand(cx+ix,cz+iz,31)*companyWords.length)]+' '+suffixes[Math.floor(hRand(cx-ix,cz-iz,32)*suffixes.length)];
+    if(hRand(cx+ix,cz+iz,11)>.76){
+      const sm=new THREE.MeshBasicMaterial({map:signTexture(name.split(' ')[0],pick(['#54e8ff','#ff4fd8','#ffd56a','#69ff9d'])),transparent:true,side:THREE.DoubleSide});
       const sign=new THREE.Mesh(new THREE.PlaneGeometry(Math.min(w*.8,13),3.5),sm);sign.position.set(bx,h*.68,bz+d/2+.03);g.add(sign);
+    }
+    const enterable=hRand(cx*19+ix,cz*23+iz,40)>.18;
+    if(enterable){
+      const doorColor=pick([0x54e8ff,0xff4fd8,0xffd56a,0x6affb0]);
+      const door=new THREE.Mesh(new THREE.BoxGeometry(2.35,3.4,.16),new THREE.MeshStandardMaterial({color:0x09101a,emissive:doorColor,emissiveIntensity:.32,roughness:.28}));door.position.set(bx,1.7,bz+d/2+.1);g.add(door);
+      const canopy=new THREE.Mesh(new THREE.BoxGeometry(3.3,.18,1.15),new THREE.MeshStandardMaterial({color:0x20293a,metalness:.55,roughness:.35}));canopy.position.set(bx,3.6,bz+d/2+.48);g.add(canopy);
+      const types=h>45?['generic_lobby','generic_office','generic_office']:h<15?['generic_shop','generic_apartment','generic_storage']:['generic_lobby','generic_apartment','generic_office','generic_shop'];
+      const interior=types[Math.floor(hRand(cx+ix*7,cz+iz*11,41)*types.length)];
+      g.userData.entries.push({id:`building_${cx}_${cz}_${ix}_${iz}`,name,kind:'building',interior,door:new THREE.Vector3(wx,1,wz+d/2+2),returnPoint:new THREE.Vector3(wx,1,wz+d/2+4.1)});
     }
     g.userData.dynamicColliders.push({minX:wx-w/2-.35,maxX:wx+w/2+.35,minZ:wz-d/2-.35,maxZ:wz+d/2+.35,top:h});
   }
@@ -494,9 +581,9 @@ class WorldManager {
     const poleMat=new THREE.MeshStandardMaterial({color:0x242937,metalness:.7,roughness:.35});const bulbMat=new THREE.MeshBasicMaterial({color:0xbfefff});
     for(const p of [-72,24,72]){for(const z of [-105,105]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.1,5,6),poleMat);pole.position.set(p,2.5,z);g.add(pole);const b=new THREE.Mesh(new THREE.SphereGeometry(.15,6,4),bulbMat);b.position.set(p,5,z);g.add(b);}}
   }
-  nearSpecial(x,z,r){return this.special.some(s=>Math.hypot(s.x-x,s.z-z)<(s.radius||30)+r);}
+  nearSpecial(x,z,r){return this.special.some(s=>Math.hypot(s.x-x,s.z-z)<(s.radius||30)+r)||(commerce?.venues||[]).some(v=>Math.hypot(v.pos.x-x,v.pos.z-z)<(v.radius||22)+r);}
   removeChunk(k,c){this.root.remove(c.group);c.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&!Object.values(this.materials).includes(o.material)){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>m.dispose?.());}});this.chunks.delete(k);}
-  rebuildColliders(cx,cz){this.colliders=[];for(const c of this.chunks.values()){if(Math.abs(c.cx-cx)<=1&&Math.abs(c.cz-cz)<=1)this.colliders.push(...c.group.userData.dynamicColliders);}this.colliders.push(...this.special.map(s=>s.collider).filter(Boolean));}
+  rebuildColliders(cx,cz){this.colliders=[];this.activeEntries=[];for(const c of this.chunks.values()){if(Math.abs(c.cx-cx)<=1&&Math.abs(c.cz-cz)<=1){this.colliders.push(...c.group.userData.dynamicColliders);this.activeEntries.push(...(c.group.userData.entries||[]));}}this.colliders.push(...this.special.map(s=>s.collider).filter(Boolean));if(commerce)this.colliders.push(...commerce.colliders);}
   collides(x,z,r=.42){for(const b of this.colliders){if(x+r>b.minX&&x-r<b.maxX&&z+r>b.minZ&&z-r<b.maxZ)return true;}return false;}
   nearestRoad(pos){
     const step=this.roadStep;const rx=Math.round(pos.x/step)*step,rz=Math.round(pos.z/step)*step;
@@ -525,49 +612,65 @@ class WorldManager {
     const s={name,id,x:pos.x,z:pos.z,radius,door:new THREE.Vector3(pos.x,0,pos.z+radius/2+2.2),group:g,collider:{minX:pos.x-radius*.65,maxX:pos.x+radius*.65,minZ:pos.z-radius*.5,maxZ:pos.z+radius*.5,top:height}};
     this.special.push(s);
   }
-  getDoorNear(pos,max=5){return this.special.find(s=>dist2D(pos,s.door)<max);}
+  getDoorNear(pos,max=5){const special=this.special.find(s=>dist2D(pos,s.door)<max);if(special)return {...special,kind:'landmark',interior:special.id,returnPoint:special.door.clone().add(new THREE.Vector3(0,1,4))};return this.activeEntries.find(e=>dist2D(pos,e.door)<max)||null;}
 }
 
 // ---------------- Interiors ----------------
 class InteriorManager {
-  constructor(){this.root=new THREE.Group();scene.add(this.root);this.rooms={};this.createRooms();}
+  constructor(){this.root=new THREE.Group();scene.add(this.root);this.rooms={};this.currentRoom=null;this.currentEntry=null;this.returnPoint=null;this.createRooms();}
   createRooms(){
     const defs=[
-      ['casino','Vanta Casino',0x9a39ff],['club','Pulse Club',0xff3b9f],['safehouse','Kai Safehouse',0x43dfff],['garage','Orbit Garage',0xffa64d],
-      ['tower','Crown Tower',0x55eeff],['harbor','Harbor Warehouse',0x4f7cff],['depot','Red Mesa Depot',0xff6a36],['marina','Azure Marina Office',0x35dfff],['estate','Solaria Estate',0xffd15a]
+      ['casino','Vanta Casino',0x9a39ff,'casino'],['club','Pulse Club',0xff3b9f,'club'],['safehouse','Kai Safehouse',0x43dfff,'property'],['garage','Orbit Garage',0xffa64d,'garage'],
+      ['tower','Crown Tower',0x55eeff,'office'],['harbor','Harbor Warehouse',0x4f7cff,'storage'],['depot','Red Mesa Depot',0xff6a36,'storage'],['marina','Azure Marina Office',0x35dfff,'office'],['estate','Solaria Estate',0xffd15a,'property'],
+      ['generic_lobby','Building Lobby',0x55dfff,'lobby'],['generic_office','Office Floor',0x65b8ff,'office'],['generic_apartment','Private Apartment',0xffc66b,'apartment'],['generic_shop','Retail Interior',0xff67b8,'shop'],['generic_storage','Service Basement',0xff8b52,'storage'],
+      ['gunshop','Ammunation Works',0xff5e68,'gunshop'],['property_room','Owned Residence',0x6affb0,'property']
     ];
-    defs.forEach((d,i)=>this.rooms[d[0]]=this.createRoom(d[0],d[1],d[2],i));
+    defs.forEach((d,i)=>this.rooms[d[0]]=this.createRoom(d[0],d[1],d[2],i,d[3]));
   }
-  createRoom(id,name,color,index){
-    const baseX=index*80,baseY=900;const g=new THREE.Group();g.position.set(baseX,baseY,0);g.visible=false;
-    const floor=new THREE.Mesh(new THREE.PlaneGeometry(48,40),new THREE.MeshStandardMaterial({color:0x262b38,roughness:.45,metalness:.15}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;g.add(floor);
-    const wallMat=new THREE.MeshStandardMaterial({color:0x121725,roughness:.65});
-    const walls=[[0,5,-20,48,10,1],[0,5,20,48,10,1],[-24,5,0,1,10,40],[24,5,0,1,10,40]];
-    walls.forEach(w=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w[3],w[4],w[5]),wallMat);m.position.set(w[0],w[1],w[2]);m.receiveShadow=true;g.add(m);});
-    const rug=new THREE.Mesh(new THREE.PlaneGeometry(18,11),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.12,roughness:.65}));rug.rotation.x=-Math.PI/2;rug.position.y=.02;g.add(rug);
-    for(let i=0;i<8;i++){const light=new THREE.PointLight(color,1.6,22,2);light.position.set(-18+i%4*12,5.5,i<4?-14:14);g.add(light);}
+  box(g,x,y,z,w,h,d,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=settings.shadows;m.receiveShadow=true;g.add(m);return m;}
+  createRoom(id,name,color,index,theme){
+    const baseX=index*90,baseY=900;const g=new THREE.Group();g.position.set(baseX,baseY,0);g.visible=false;
+    const floorMat=new THREE.MeshStandardMaterial({color:theme==='property'?0x554d47:theme==='gunshop'?0x30343d:0x262b38,roughness:.45,metalness:.12});
+    const floor=new THREE.Mesh(new THREE.PlaneGeometry(48,40),floorMat);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;g.add(floor);
+    const wallMat=new THREE.MeshStandardMaterial({color:theme==='apartment'||theme==='property'?0x3a3540:0x121725,roughness:.65});
+    [[0,5,-20,48,10,1],[0,5,20,48,10,1],[-24,5,0,1,10,40],[24,5,0,1,10,40]].forEach(w=>this.box(g,w[0],w[1],w[2],w[3],w[4],w[5],wallMat));
+    const rug=new THREE.Mesh(new THREE.PlaneGeometry(theme==='storage'?10:18,theme==='storage'?8:11),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.1,roughness:.7}));rug.rotation.x=-Math.PI/2;rug.position.y=.02;g.add(rug);
+    const lightCount=settings.preset==='potato'?2:6;for(let i=0;i<lightCount;i++){const light=new THREE.PointLight(color,1.15,25,2);light.position.set(-18+i%3*18,5.5,i<3?-13:13);g.add(light);}
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(15,3),new THREE.MeshBasicMaterial({map:signTexture(name,color===0xff3b9f?'#ff4fd8':'#54e8ff'),transparent:true}));sign.position.set(0,5,-19.45);g.add(sign);
+    this.addFurniture(g,theme,color);
     const doorPos=new THREE.Vector3(baseX,baseY+.8,17.2);
-    scene.add(g);return{id,name,color,group:g,spawn:new THREE.Vector3(baseX,baseY+.8,13.5),exit:doorPos};
+    scene.add(g);return{id,name,color,theme,group:g,spawn:new THREE.Vector3(baseX,baseY+.8,13.5),exit:doorPos};
   }
-  enter(id){
+  addFurniture(g,theme,color){
+    const wood=new THREE.MeshStandardMaterial({color:0x66462f,roughness:.72});const dark=new THREE.MeshStandardMaterial({color:0x171d29,metalness:.3,roughness:.4});const pale=new THREE.MeshStandardMaterial({color:0xd8d5cc,roughness:.8});const screen=new THREE.MeshBasicMaterial({color:0x62e9ff});
+    if(['lobby','casino','club'].includes(theme)){this.box(g,0,.65,-8,10,1.3,2,wood);for(const x of [-15,15]){this.box(g,x,.45,4,5,.9,2.2,dark);this.box(g,x,.8,5.1,5,1.2,.3,dark);}for(const x of [-8,8]){this.box(g,x,1.1,-15,.7,2.2,.7,new THREE.MeshStandardMaterial({color:0x287a4d}));}}
+    if(['office','garage'].includes(theme)){for(const z of [-10,0,10])for(const x of [-14,0,14]){this.box(g,x,.65,z,6,1.3,2.6,wood);this.box(g,x,1.7,z-.4,2.4,1.3,.12,screen);}}
+    if(['apartment','property'].includes(theme)){this.box(g,-13,.6,-10,8,1.2,6,pale);this.box(g,-13,1.25,-12.2,8,1.2,1,pale);this.box(g,8,.55,4,8,1.1,3,dark);this.box(g,8,1.15,5.4,8,1.2,.35,dark);this.box(g,10,.8,-10,9,1.6,3,wood);this.box(g,17,2.2,-10,1.2,4.4,6,dark);}
+    if(theme==='shop'){for(const x of [-14,-7,0,7,14])this.box(g,x,1.35,-5,1.2,2.7,14,dark);this.box(g,0,.7,10,18,1.4,2.5,wood);}
+    if(theme==='storage'){for(let i=0;i<22;i++){const x=-18+(i%6)*7,z=-13+Math.floor(i/6)*8;this.box(g,x,.65,z,2.4,1.3,2.4,new THREE.MeshStandardMaterial({color:i%3===0?0x72513b:0x4b515e,roughness:.9}));}}
+    if(theme==='gunshop'){this.box(g,0,.8,-4,20,1.6,2.5,dark);for(const z of [-14,-10])for(const x of [-16,-8,0,8,16]){const rack=this.box(g,x,2,z,.16,.16,4,new THREE.MeshStandardMaterial({color:0x555e70,metalness:.7,roughness:.25}));rack.rotation.y=Math.PI/2;}for(const x of [-15,15])this.box(g,x,.8,9,5,1.6,5,new THREE.MeshStandardMaterial({color:0x394353,metalness:.25,roughness:.45}));}
+  }
+  enter(id,entry=null){
     const room=this.rooms[id];if(!room)return;
-    state.inInterior=room.name;room.group.visible=true;player.exitVehicle(true);player.group.position.copy(room.spawn);player.velocity.set(0,0,0);world.root.visible=false;world.specialRoot.visible=false;traffic.root.visible=false;pedestrians.root.visible=false;startMarker.visible=false;showToast('Entered '+room.name);updateObjectiveMarker();
+    if(this.currentRoom)this.currentRoom.group.visible=false;
+    this.currentRoom=room;this.currentEntry=entry||{id,name:room.name,kind:'landmark',interior:id};this.returnPoint=entry?.returnPoint?.clone?.()||entry?.door?.clone?.().add(new THREE.Vector3(0,1,4))||null;
+    state.inInterior=entry?.name||room.name;room.group.visible=true;player.exitVehicle(true);player.group.position.copy(room.spawn);player.velocity.set(0,0,0);world.root.visible=false;world.specialRoot.visible=false;commerce.root.visible=false;traffic.root.visible=false;pedestrians.root.visible=false;startMarker.visible=false;showToast('Entered '+state.inInterior);updateObjectiveMarker();
   }
   exit(){
-    const special=world.special.find(s=>s.name===state.inInterior||this.rooms[s.id]?.name===state.inInterior);const room=Object.values(this.rooms).find(r=>r.name===state.inInterior);if(room)room.group.visible=false;
-    state.inInterior=null;world.root.visible=true;world.specialRoot.visible=true;traffic.root.visible=true;pedestrians.root.visible=true;
-    const target=special?special.door.clone().add(new THREE.Vector3(0,1,4)):new THREE.Vector3(0,1,20);player.group.position.copy(target);state.lastSafe={x:target.x,y:target.y,z:target.z};world.update(player.group.position);showToast('Back outside');updateObjectiveMarker();
+    const room=this.currentRoom;if(room)room.group.visible=false;state.inInterior=null;world.root.visible=true;world.specialRoot.visible=true;commerce.root.visible=true;traffic.root.visible=true;pedestrians.root.visible=true;
+    let target=this.returnPoint?.clone();if(!target&&this.currentEntry){const special=world.special.find(s=>s.id===this.currentEntry.id);if(special)target=special.door.clone().add(new THREE.Vector3(0,1,4));}if(!target)target=new THREE.Vector3(0,1,20);
+    player.group.position.copy(target);state.lastSafe={x:target.x,y:target.y,z:target.z};this.currentRoom=null;this.currentEntry=null;this.returnPoint=null;world.update(player.group.position);showToast('Back outside');updateObjectiveMarker();
   }
-  doorNear(pos){if(!state.inInterior)return null;const room=Object.values(this.rooms).find(r=>r.name===state.inInterior);return room&&pos.distanceTo(room.exit)<4?room:null;}
+  doorNear(pos){return this.currentRoom&&pos.distanceTo(this.currentRoom.exit)<4?this.currentRoom:null;}
+  activeLocalPosition(){if(!this.currentRoom)return null;return new THREE.Vector3(player.position.x-this.currentRoom.group.position.x,player.position.y-this.currentRoom.group.position.y,player.position.z-this.currentRoom.group.position.z);}
 }
 
 // ---------------- Player controller ----------------
 class Player {
   constructor(){
     this.group=createCharacterMesh({shirt:0x1e8fb7,pants:0x161a24,hair:0x23150f,skin:0xb97850});this.group.position.set(0,1,18);scene.add(this.group);
-    this.velocity=new THREE.Vector3();this.yaw=0;this.pitch=.22;this.onGround=true;this.inCar=null;this.camDist=6.4;this.fireCooldown=0;this.punchCooldown=0;
-    this.lastPos=this.group.position.clone();
+    this.velocity=new THREE.Vector3();this.yaw=0;this.pitch=.22;this.onGround=true;this.inCar=null;this.camDist=6.4;this.fireCooldown=0;this.punchCooldown=0;this.reloading=false;
+    this.weaponModel=createHeldWeaponModel(0);this.group.userData.parts.armR.add(this.weaponModel);this.lastPos=this.group.position.clone();
   }
   get position(){return this.inCar?this.inCar.mesh.position:this.group.position;}
   update(dt){
@@ -593,16 +696,16 @@ class Player {
     if(this.group.position.y<=1){this.group.position.y=1;this.velocity.y=0;this.onGround=true;}
     const hs=Math.hypot(this.velocity.x,this.velocity.z);if(hs>.2){this.group.rotation.y=Math.atan2(this.velocity.x,this.velocity.z);state.lastSafe={x:this.group.position.x,y:1,z:this.group.position.z};}
     this.group.userData.animate(hs,state.gameTime);world.update(this.group.position);this.lastPos.copy(this.group.position);
-    if(mouse.down&&state.weapon===1)this.shoot();
+    if(mouse.down&&state.weapon>0)this.shoot();
   }
   updateInteriorWalk(dt){
     this.yaw-=mouse.dx*.0022*settings.sensitivity;this.pitch=clamp(this.pitch-mouse.dy*.0017*settings.sensitivity,-.2,.85);mouse.dx=mouse.dy=0;
     const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);const move=new THREE.Vector3();
     if(f||s){const fw=new THREE.Vector3(Math.sin(this.yaw),0,Math.cos(this.yaw));const rt=new THREE.Vector3(fw.z,0,-fw.x);move.addScaledVector(fw,f).addScaledVector(rt,s).normalize();}
     const speed=keys.ShiftLeft?7:4.5;this.velocity.x=lerp(this.velocity.x,move.x*speed,.18);this.velocity.z=lerp(this.velocity.z,move.z*speed,.18);
-    const room=Object.values(interiors.rooms).find(r=>r.name===state.inInterior);if(room){const cx=room.group.position.x,cz=room.group.position.z;this.group.position.x=clamp(this.group.position.x+this.velocity.x*dt,cx-22.7,cx+22.7);this.group.position.z=clamp(this.group.position.z+this.velocity.z*dt,cz-18.7,cz+18.7);}
+    const room=interiors.currentRoom;if(room){const cx=room.group.position.x,cz=room.group.position.z;this.group.position.x=clamp(this.group.position.x+this.velocity.x*dt,cx-22.7,cx+22.7);this.group.position.z=clamp(this.group.position.z+this.velocity.z*dt,cz-18.7,cz+18.7);}
     const hs=Math.hypot(this.velocity.x,this.velocity.z);if(hs>.2)this.group.rotation.y=Math.atan2(this.velocity.x,this.velocity.z);this.group.userData.animate(hs,state.gameTime);
-    if(mouse.down&&state.weapon===1)this.shoot();
+    if(mouse.down&&state.weapon>0)this.shoot();
   }
   updateDriving(dt){
     mouse.dx=mouse.dy=0;const car=this.inCar;const throttle=(keys.KeyW?1:0)-(keys.KeyS?1:0),steer=(keys.KeyA?1:0)-(keys.KeyD?1:0);
@@ -627,12 +730,16 @@ class Player {
     this.group.position.copy(exit);this.group.visible=true;car.occupied=false;car.speed*=.6;this.inCar=null;dom.speed.classList.add('hidden');audio.setEngine(0,false);showToast('Vehicle exited');
   }
   shoot(){
-    if(this.fireCooldown>0||state.ammo<=0||this.inCar)return;this.fireCooldown=.22;state.ammo--;audio.beep(105,.08,'square',.16);
-    const origin=camera.position.clone(),dir=new THREE.Vector3();camera.getWorldDirection(dir);raycaster.set(origin,dir);raycaster.far=70;
-    const targets=[...pedestrians.people,...police.units].filter(n=>!n.down).map(n=>n.mesh);
-    const hits=raycaster.intersectObjects(targets,true);if(hits.length){let o=hits[0].object;while(o.parent&&!o.userData.npcRef)o=o.parent;const n=o.userData.npcRef||hits[0].object.userData.npcRef;if(n){n.hit(55,'shot');addHeat(1.2);missions.event('enemyHit',{npc:n});}}
-    createMuzzleTrace(origin,origin.clone().add(dir.multiplyScalar(hits.length?hits[0].distance:55)));
-    updateHud();
+    const w=currentWeapon(),inv=state.inventory[w.id];if(w.slot===0||this.fireCooldown>0||this.inCar||this.reloading)return;
+    if(!inv?.owned){switchWeapon(0);return;}if(inv.mag<=0){reloadWeapon();return;}
+    this.fireCooldown=w.fireRate;inv.mag--;audio.beep(w.slot===3?78:w.slot===5?62:105,w.slot===5?.14:.08,'square',w.slot>=4?.19:.14);
+    const origin=camera.position.clone(),baseDir=new THREE.Vector3();camera.getWorldDirection(baseDir);const targets=[...new Set([...pedestrians.people,...police.units])].filter(n=>!n.down).map(n=>n.mesh);let firstEnd=null,hitSomeone=false;
+    for(let pellet=0;pellet<w.pellets;pellet++){
+      const dir=baseDir.clone().add(new THREE.Vector3(rand(-w.spread,w.spread),rand(-w.spread,w.spread),rand(-w.spread,w.spread))).normalize();raycaster.set(origin,dir);raycaster.far=w.range;
+      const hits=raycaster.intersectObjects(targets,true);let end=origin.clone().add(dir.clone().multiplyScalar(hits.length?hits[0].distance:w.range));if(!firstEnd)firstEnd=end;
+      if(hits.length){let o=hits[0].object;while(o.parent&&!o.userData.npcRef)o=o.parent;const n=o.userData.npcRef||hits[0].object.userData.npcRef;if(n){n.hit(w.damage,'shot');hitSomeone=true;missions.event('enemyHit',{npc:n});}}
+    }
+    if(firstEnd)createMuzzleTrace(origin,firstEnd);addHeat(hitSomeone?w.heat:w.heat*.35);this.weaponModel.rotation.z=rand(-.06,.06);setTimeout(()=>{if(this.weaponModel)this.weaponModel.rotation.z=0;},65);updateHud();
   }
   punch(){
     if(this.inCar||this.punchCooldown>0)return;this.punchCooldown=.45;const near=pedestrians.nearest(this.group.position,2.1);if(near){near.hit(32,'punch');addHeat(.7);audio.beep(120,.06,'square',.08);}this.group.userData.parts.armR.rotation.x=-1.5;setTimeout(()=>{if(this.group)this.group.userData.parts.armR.rotation.x=0;},180);
@@ -645,7 +752,7 @@ class Player {
     const p=world.nearestRoad(state.lastSafe);this.group.position.set(p.x,1,p.z);showBanner('WASTED?','Not today. Crown City gives second chances.');missions.event('respawn',{});updateHud();
   }
   unstuck(){
-    this.exitVehicle(true);if(state.inInterior){const room=Object.values(interiors.rooms).find(r=>r.name===state.inInterior);this.group.position.copy(room.spawn);}else{const p=world.nearestRoad(this.group.position);this.group.position.set(p.x,1,p.z);}this.velocity.set(0,0,0);showToast('Moved to a safe position');
+    this.exitVehicle(true);if(state.inInterior){const room=interiors.currentRoom;if(room)this.group.position.copy(room.spawn);}else{const p=world.nearestRoad(this.group.position);this.group.position.set(p.x,1,p.z);}this.velocity.set(0,0,0);showToast('Moved to a safe position');
   }
 }
 
@@ -757,6 +864,61 @@ class WeatherSystem {
     if(this.group.visible){this.group.position.copy(player.position);const a=this.points.geometry.attributes.position.array;for(let i=0;i<a.length/3;i++){a[i*3+1]-=dt*32;if(a[i*3+1]<0)a[i*3+1]=40;}this.points.geometry.attributes.position.needsUpdate=true;}
   }
 }
+
+
+// ---------------- Properties, shops and enterable venues ----------------
+class CommerceSystem {
+  constructor(){this.root=new THREE.Group();scene.add(this.root);this.venues=[];this.colliders=[];this.incomeAccumulator=0;this.createVenues();}
+  createVenues(){
+    const gunStores=[
+      ['strip_arms','Crown Arms Exchange',120,72],['mesa_arms','Red Mesa Outfitters',-552,120],['coast_arms','Azure Defence Supply',552,-120],['harbor_arms','Dockside Hardware',-72,-552]
+    ];
+    const properties=[
+      ['sunset_flat','Sunset Boulevard Flat',72,168,2200,55,'A compact first home near the Crown Strip.'],['mirage_loft','Mirage Beach Loft',504,168,5200,110,'Ocean views, a private wardrobe and a larger daily income.'],['mesa_ranch','Red Mesa Ranch House',-600,-120,6800,145,'A quiet desert property with a secure equipment room.'],['harbor_penthouse','Harbor Lights Penthouse',120,-600,9800,210,'A converted harbor tower overlooking the old docks.'],['solaria_villa','Solaria Hills Villa',216,648,14500,320,'A private hilltop villa with the city’s best sunrise view.'],['dominion_suite','Dominion Casino Suite',-168,216,22000,500,'The most expensive residence in central Crown City.']
+    ];
+    for(const [id,name,x,z] of gunStores)this.addVenue({id,name,type:'gunstore',pos:new THREE.Vector3(x,0,z),price:0,income:0,description:'Licensed equipment, ammunition and protective armour.'},0xff5e68);
+    for(const [id,name,x,z,price,income,description] of properties)this.addVenue({id,name,type:'property',pos:new THREE.Vector3(x,0,z),price,income,description},0x6affb0);
+  }
+  addVenue(v,color){
+    v.radius=v.type==='property'?16:18;const g=new THREE.Group();g.position.copy(v.pos);const wall=new THREE.MeshStandardMaterial({color:v.type==='property'?0x3f4656:0x252b34,roughness:.52,metalness:.18,emissive:color,emissiveIntensity:.06});
+    const h=v.type==='property'?12:10,w=v.type==='property'?24:28,d=v.type==='property'?22:24;const base=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),wall);base.position.y=h/2;base.castShadow=true;base.receiveShadow=true;g.add(base);
+    const roof=new THREE.Mesh(new THREE.BoxGeometry(w+1,.5,d+1),new THREE.MeshStandardMaterial({color:0x171c27,metalness:.38,roughness:.42}));roof.position.y=h+.25;g.add(roof);
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(Math.min(21,w-3),3.1),new THREE.MeshBasicMaterial({map:signTexture(v.type==='property'?'PROPERTY':v.name.split(' ')[0],v.type==='property'?'#6affb0':'#ff5e68'),transparent:true}));sign.position.set(0,h*.68,d/2+.03);g.add(sign);
+    const door=new THREE.Mesh(new THREE.BoxGeometry(2.8,3.8,.18),new THREE.MeshStandardMaterial({color:0x080c14,emissive:color,emissiveIntensity:.38}));door.position.set(0,1.9,d/2+.12);g.add(door);
+    if(v.type==='property'){for(const x of [-7,7]){const win=new THREE.Mesh(new THREE.PlaneGeometry(4,2.8),new THREE.MeshBasicMaterial({color:0x9ddfff,transparent:true,opacity:.7}));win.position.set(x,6.3,d/2+.04);g.add(win);}}
+    v.group=g;v.door=new THREE.Vector3(v.pos.x,1,v.pos.z+d/2+2);v.returnPoint=new THREE.Vector3(v.pos.x,1,v.pos.z+d/2+4.3);v.collider={minX:v.pos.x-w/2-.3,maxX:v.pos.x+w/2+.3,minZ:v.pos.z-d/2-.3,maxZ:v.pos.z+d/2+.3,top:h};this.root.add(g);this.venues.push(v);this.colliders.push(v.collider);
+  }
+  doorNear(pos,max=5){return this.venues.find(v=>dist2D(pos,v.door)<max)||null;}
+  isOwned(id){return state.ownedProperties.includes(id);}
+  enterVenue(v){if(v.type==='gunstore')interiors.enter('gunshop',{...v,kind:'gunstore',interior:'gunshop'});else if(this.isOwned(v.id))interiors.enter('property_room',{...v,kind:'property',interior:'property_room'});else this.openProperty(v);}
+  openProperty(v){
+    state.commerceOpen=true;state.paused=true;dom.commerce.classList.remove('hidden');document.exitPointerLock();dom.commerceEyebrow.textContent='Crown City Property Network';dom.commerceTitle.textContent=v.name;dom.commerceDescription.textContent=v.description;
+    dom.commerceItems.innerHTML='';const owned=this.isOwned(v.id);const card=document.createElement('div');card.className='storeItem';card.innerHTML=`<h3>${owned?'Residence owned':'Purchase residence'}</h3><p>Includes a personal save point, full health recovery, wardrobe armour storage and passive income of $${v.income}.</p><div class="price">${owned?'OWNED':formatMoney(v.price)}</div>`;
+    const btn=document.createElement('button');btn.className='primary';btn.textContent=owned?'Enter home':'Buy property';btn.onclick=()=>{if(owned){closeCommerce();interiors.enter('property_room',{...v,kind:'property',interior:'property_room'});return;}if(state.money<v.price){showToast('Not enough money');return;}state.money-=v.price;state.ownedProperties.push(v.id);showBanner('PROPERTY PURCHASED',v.name);saveGame(false);updateHud();this.openProperty(v);};card.appendChild(btn);dom.commerceItems.appendChild(card);
+  }
+  openGunStore(){
+    state.commerceOpen=true;state.paused=true;dom.commerce.classList.remove('hidden');document.exitPointerLock();dom.commerceEyebrow.textContent='Licensed Crown City Dealer';dom.commerceTitle.textContent=interiors.currentEntry?.name||'Weapon Store';dom.commerceDescription.textContent='Purchase weapons, ammunition and armour. Items remain available in every owned property and survive saved games.';dom.commerceItems.innerHTML='';
+    for(const w of WEAPONS.filter(x=>x.slot>0)){const inv=state.inventory[w.id];const card=document.createElement('div');card.className='storeItem';card.innerHTML=`<h3>${w.name}</h3><p>${w.slot===1?'Reliable sidearm':w.slot===2?'Fast close-range automatic':w.slot===3?'Powerful short-range spread':w.slot===4?'Accurate long-range carbine':'Heavy high-impact specialist weapon'} • Slot ${w.slot+1}</p><div class="price">${inv.owned?'OWNED':formatMoney(w.price)}</div>`;
+      const buy=document.createElement('button');buy.className=inv.owned?'secondary':'primary';buy.textContent=inv.owned?`Buy ammo ${formatMoney(w.ammoPrice)}`:'Buy weapon';buy.onclick=()=>{if(!inv.owned){if(state.money<w.price){showToast('Not enough money');return;}state.money-=w.price;inv.owned=true;inv.mag=w.clipSize;inv.reserve=w.ammoPack;switchWeapon(w.slot);showBanner('WEAPON PURCHASED',w.name);}else{if(state.money<w.ammoPrice){showToast('Not enough money');return;}state.money-=w.ammoPrice;inv.reserve+=w.ammoPack;showToast(`${w.name} ammunition purchased`);}saveGame(false);updateHud();this.openGunStore();};card.appendChild(buy);dom.commerceItems.appendChild(card);
+    }
+    const armor=document.createElement('div');armor.className='storeItem';armor.innerHTML='<h3>Protective armour</h3><p>Restores armour to 100. Armour absorbs damage before health.</p><div class="price">$000450</div>';const ab=document.createElement('button');ab.className='primary';ab.textContent='Buy armour';ab.onclick=()=>{if(state.money<450){showToast('Not enough money');return;}state.money-=450;state.armor=100;showToast('Armour equipped');saveGame(false);updateHud();this.openGunStore();};armor.appendChild(ab);dom.commerceItems.appendChild(armor);
+  }
+  getInteriorAction(pos){
+    const entry=interiors.currentEntry,room=interiors.currentRoom;if(!entry||!room)return null;const local=new THREE.Vector3(pos.x-room.group.position.x,0,pos.z-room.group.position.z);
+    if(entry.kind==='gunstore'&&Math.hypot(local.x,local.z+4)<8)return{text:'Press E to browse weapons and ammunition',action:()=>this.openGunStore()};
+    if(entry.kind==='property'){
+      if(Math.hypot(local.x+13,local.z+10)<5)return{text:'Press E to sleep, heal and save',action:()=>{state.health=100;state.armor=Math.max(state.armor,35);state.time=8;saveGame(false);showBanner('RESTED','Health restored and game saved');}};
+      if(Math.hypot(local.x-17,local.z+10)<4)return{text:'Press E to use wardrobe armour storage',action:()=>{state.armor=100;showToast('Armour restored from wardrobe');updateHud();}};
+    }
+    if(entry.kind==='building'&&Math.hypot(local.x,local.z+8)<5&&!state.lootedBuildings.includes(entry.id))return{text:'Press E to search the interior',action:()=>{const cash=Math.floor(35+hash2(entry.id.length,state.lootedBuildings.length)*165);state.money+=cash;state.lootedBuildings.push(entry.id);showToast(`Found $${cash}`);updateHud();}};
+    return null;
+  }
+  update(dt){
+    if(!state.running||state.paused)return;this.incomeAccumulator+=dt;if(this.incomeAccumulator>180&&state.ownedProperties.length){this.incomeAccumulator=0;const total=this.venues.filter(v=>v.type==='property'&&this.isOwned(v.id)).reduce((n,v)=>n+v.income,0);state.money+=total;showToast(`Property income +$${total}`);updateHud();}
+  }
+}
+
+function closeCommerce(){dom.commerce.classList.add('hidden');state.commerceOpen=false;state.paused=false;if(state.running)renderer.domElement.requestPointerLock();}
 
 // ---------------- Missions and story ----------------
 const STORY = [
@@ -881,7 +1043,7 @@ class MissionSystem {
     if(s.time){this.timer-=dt;if(this.timer<=0){showToast('Mission timer expired');this.failMission('You ran out of time.');return;}}
     if(s.type==='goto'&&dist2D(pos,s.pos)<s.radius)this.nextStage();
     else if(s.type==='timedGoto'&&dist2D(pos,s.pos)<s.radius)this.nextStage();
-    else if(s.type==='enterInterior'&&state.inInterior&&Object.keys(interiors.rooms).find(k=>interiors.rooms[k].name===state.inInterior)===s.interior)this.nextStage();
+    else if(s.type==='enterInterior'&&state.inInterior&&interiors.currentRoom?.id===s.interior)this.nextStage();
     else if(s.type==='exitInterior'&&!state.inInterior&&state.missionData.wasInside){state.missionData.wasInside=false;this.nextStage();}
     else if(s.type==='exitInterior'&&state.inInterior)state.missionData.wasInside=true;
     else if(s.type==='loseHeat'&&state.heat===0)this.nextStage();
@@ -946,7 +1108,7 @@ function interact(){
   if(promptAction){const a=promptAction;clearPrompt();a();return;}
   if(state.inInterior){const d=interiors.doorNear(player.position);if(d){interiors.exit();return;}}
   else{
-    const door=world.getDoorNear(player.position,5.5);if(door){interiors.enter(door.id);return;}
+    const venue=commerce.doorNear(player.position,5.5);if(venue){commerce.enterVenue(venue);return;}const door=world.getDoorNear(player.position,5.5);if(door){interiors.enter(door.interior||door.id,door);return;}
     if(!state.currentMission){const m=STORY[state.missionIndex];if(m&&dist2D(player.position,m.start)<7){missions.startMission();return;}}
     const n=pedestrians.nearest(player.position,3.5,n=>!n.hostile);if(n){missions.say([[n.name,n.talk]]);return;}
   }
@@ -962,7 +1124,7 @@ function showToast(text,d=2.2){dom.toast.textContent=text;dom.toast.classList.ad
 function showBanner(title,sub=''){dom.banner.querySelector('h2').textContent=title;dom.banner.querySelector('p').textContent=sub;dom.banner.classList.add('show');bannerTimer=3.3;audio.beep(520,.15,'triangle',.12);setTimeout(()=>audio.beep(780,.18,'triangle',.1),110);}
 function updateHud(){
   dom.money.textContent=formatMoney(state.money);dom.healthFill.style.width=state.health+'%';dom.healthText.textContent=Math.ceil(state.health);dom.armorFill.style.width=state.armor+'%';dom.armorText.textContent=Math.ceil(state.armor);
-  dom.wanted.textContent='★'.repeat(Math.ceil(state.heat))+'☆'.repeat(5-Math.ceil(state.heat));dom.weapon.textContent=state.weapon===0?'UNARMED  •  Q PUNCH':`PULSE EMITTER  •  ${state.ammo} CHARGES`;
+  dom.wanted.textContent='★'.repeat(Math.ceil(state.heat))+'☆'.repeat(5-Math.ceil(state.heat));const w=currentWeapon(),inv=state.inventory[w.id];dom.weapon.textContent=w.slot===0?'UNARMED  •  Q PUNCH':`${w.name.toUpperCase()}  •  ${inv.mag}/${inv.reserve}`;updateWeaponSlots();
   const m=STORY[state.missionIndex],s=m?.stages[state.missionStage];
   if(state.currentMission&&m&&s){dom.missionTitle.textContent=m.title;dom.missionObjective.textContent=s.text;let prog='';if(s.time)prog=`TIME ${Math.max(0,missions.timer).toFixed(0)}s`;if(s.type==='defeat')prog+=`${prog?'  •  ':''}${missions.defeated}/${s.count}`;if(s.type==='collect')prog+=`${prog?'  •  ':''}${missions.collectIndex}/${s.count}`;if(s.type==='race')prog+=`${prog?'  •  ':''}CHECKPOINT ${missions.raceIndex+1}/${s.points.length}`;dom.missionProgress.textContent=prog;}
   else if(m){dom.missionTitle.textContent='Story Mission Available';dom.missionObjective.textContent=`Meet ${m.giver} to begin “${m.title}”.`;dom.missionProgress.textContent=`MISSION ${state.missionIndex+1} OF ${STORY.length}`;}
@@ -973,13 +1135,13 @@ function updateClockAndDistrict(){
 }
 function updateSpeed(){if(player.inCar)dom.speed.firstChild.nodeValue=Math.round(Math.abs(player.inCar.speed)*3.6);}
 function updatePrompt(){
-  if(state.dialog||state.paused)return;
-  clearPrompt();
-  if(state.inInterior){if(interiors.doorNear(player.position))setPrompt('Press E to exit',()=>interiors.exit());}
+  if(state.dialog||state.paused||state.mapOpen||state.commerceOpen)return;clearPrompt();
+  if(state.inInterior){const action=commerce.getInteriorAction(player.position);if(action){setPrompt(action.text,action.action);return;}if(interiors.doorNear(player.position)){setPrompt('Press E to exit',()=>interiors.exit());return;}}
   else{
-    const door=world.getDoorNear(player.position,5.5);if(door)setPrompt('Press E to enter '+door.name,()=>interiors.enter(door.id));
-    if(!state.currentMission){const m=STORY[state.missionIndex];if(m&&dist2D(player.position,m.start)<7)setPrompt(`Press E to start “${m.title}”`,()=>missions.startMission());}
-    if(!player.inCar){const c=traffic.nearest(player.position,4.1);if(c)setPrompt('Press F to enter vehicle',()=>player.enterVehicle(c));}
+    const venue=commerce.doorNear(player.position,5.5);if(venue){setPrompt(venue.type==='property'?(commerce.isOwned(venue.id)?'Press E to enter '+venue.name:'Press E to view property for sale'):'Press E to enter '+venue.name,()=>commerce.enterVenue(venue));return;}
+    if(!state.currentMission){const m=STORY[state.missionIndex];if(m&&dist2D(player.position,m.start)<7){setPrompt(`Press E to start “${m.title}”`,()=>missions.startMission());return;}}
+    const door=world.getDoorNear(player.position,5.5);if(door){setPrompt('Press E to enter '+door.name,()=>interiors.enter(door.interior||door.id,door));return;}
+    if(!player.inCar){const c=traffic.nearest(player.position,4.1);if(c){setPrompt('Press F to enter vehicle',()=>player.enterVehicle(c));return;}}
   }
 }
 function drawMinimap(){
@@ -987,10 +1149,43 @@ function drawMinimap(){
   x.save();x.translate(w/2,h/2);x.rotate(player.yaw);
   x.strokeStyle='rgba(151,162,183,.28)';x.lineWidth=9;const step=48*scale;for(let gx=-w;gx<w;gx+=step){x.beginPath();x.moveTo(gx,-h);x.lineTo(gx,h);x.stroke();}for(let gz=-h;gz<h;gz+=step){x.beginPath();x.moveTo(-w,gz);x.lineTo(w,gz);x.stroke();}
   const marker=objectiveMarker.visible?objectiveMarker:startMarker.visible?startMarker:null;if(marker){const dx=(marker.position.x-p.x)*scale,dz=(marker.position.z-p.z)*scale;x.fillStyle=marker===startMarker?'#ffd56a':'#54e8ff';x.beginPath();x.arc(dx,dz,7,0,Math.PI*2);x.fill();}
+  if(state.waypoint){const dx=(state.waypoint.x-p.x)*scale,dz=(state.waypoint.z-p.z)*scale;x.fillStyle='#b56cff';x.beginPath();x.arc(dx,dz,6,0,Math.PI*2);x.fill();}
+  for(const v of commerce.venues){const dx=(v.pos.x-p.x)*scale,dz=(v.pos.z-p.z)*scale;if(Math.abs(dx)<w/2&&Math.abs(dz)<h/2){x.fillStyle=v.type==='gunstore'?'#ff5e68':'#6affb0';x.beginPath();x.arc(dx,dz,v.type==='property'&&commerce.isOwned(v.id)?5:3.5,0,Math.PI*2);x.fill();}}
   for(const car of traffic.cars.slice(0,25)){const dx=(car.mesh.position.x-p.x)*scale,dz=(car.mesh.position.z-p.z)*scale;if(Math.abs(dx)<w/2&&Math.abs(dz)<h/2){x.fillStyle=car.police?'#ff5c66':'#ffffff55';x.fillRect(dx-2,dz-3,4,6);}}
   x.restore();x.fillStyle='#ffffff';x.beginPath();x.moveTo(w/2,h/2-9);x.lineTo(w/2-6,h/2+7);x.lineTo(w/2+6,h/2+7);x.closePath();x.fill();
   x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=4;x.beginPath();x.arc(w/2,h/2,w/2-4,0,Math.PI*2);x.stroke();
 }
+
+
+function updateWeaponSlots(){
+  if(!dom.weaponSlots)return;dom.weaponSlots.innerHTML='';for(const w of WEAPONS){const inv=state.inventory[w.id]||{owned:false,mag:0,reserve:0};const el=document.createElement('div');el.className='weaponSlot'+(state.weapon===w.slot?' active':'')+(!inv.owned?' locked':'');el.innerHTML=`<b>${w.slot+1}</b><span>${w.short}</span><small>${w.slot===0?'MELEE':inv.owned?inv.mag+'/'+inv.reserve:'LOCKED'}</small>`;dom.weaponSlots.appendChild(el);}
+}
+function switchWeapon(slot){
+  const w=WEAPONS[slot];if(!w)return;const inv=state.inventory[w.id];if(!inv?.owned){showToast(`${w.name} is locked — visit a gun store`);return;}state.weapon=slot;dom.crosshair.classList.toggle('hidden',slot===0);if(player?.weaponModel){player.group.userData.parts.armR.remove(player.weaponModel);player.weaponModel=createHeldWeaponModel(slot);player.group.userData.parts.armR.add(player.weaponModel);}audio.beep(260+slot*45,.05,'triangle',.05);updateHud();
+}
+function cycleWeapon(dir){const owned=WEAPONS.filter(w=>state.inventory[w.id]?.owned).map(w=>w.slot);const i=owned.indexOf(state.weapon);switchWeapon(owned[(i+dir+owned.length)%owned.length]);}
+function reloadWeapon(){
+  const w=currentWeapon(),inv=state.inventory[w.id];if(w.slot===0||!inv||player.reloading||inv.mag>=w.clipSize||inv.reserve<=0)return;player.reloading=true;showToast('Reloading '+w.name,1);audio.beep(180,.12,'square',.05);setTimeout(()=>{const need=w.clipSize-inv.mag,take=Math.min(need,inv.reserve);inv.mag+=take;inv.reserve-=take;player.reloading=false;audio.beep(340,.06,'triangle',.05);updateHud();},650);
+}
+
+let mapZoom=1,mapCentre={x:0,z:0};
+function openFullMap(fromPause=false){if(!state.running)return;state.mapOpen=true;state.mapFromPause=fromPause;state.paused=true;dom.pause.classList.add('hidden');dom.fullMap.classList.remove('hidden');document.exitPointerLock();mapCentre={x:player.position.x,z:player.position.z};drawWorldMap();}
+function closeFullMap(){dom.fullMap.classList.add('hidden');state.mapOpen=false;if(state.mapFromPause){state.mapFromPause=false;state.paused=true;dom.pause.classList.remove('hidden');}else{state.paused=false;renderer.domElement.requestPointerLock();}}
+function drawWorldMap(){
+  const c=dom.worldMap,ctx=c.getContext('2d'),rect=c.getBoundingClientRect();const dpr=Math.min(devicePixelRatio,2);const cw=Math.max(600,Math.floor(rect.width*dpr)),ch=Math.max(380,Math.floor(rect.height*dpr));if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch;}const w=c.width,h=c.height,scale=.38*mapZoom*dpr;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#050813';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2-mapCentre.x*scale,h/2-mapCentre.z*scale);
+  const extentX=w/(2*scale)+100,extentZ=h/(2*scale)+100;ctx.fillStyle='#172235';ctx.fillRect((mapCentre.x-extentX)*scale,(mapCentre.z-extentZ)*scale,extentX*2*scale,extentZ*2*scale);
+  ctx.strokeStyle='rgba(120,140,170,.35)';ctx.lineWidth=14*dpr;const minX=Math.floor((mapCentre.x-extentX)/48)*48,maxX=Math.ceil((mapCentre.x+extentX)/48)*48,minZ=Math.floor((mapCentre.z-extentZ)/48)*48,maxZ=Math.ceil((mapCentre.z+extentZ)/48)*48;for(let x=minX;x<=maxX;x+=48){ctx.beginPath();ctx.moveTo(x*scale,minZ*scale);ctx.lineTo(x*scale,maxZ*scale);ctx.stroke();}for(let z=minZ;z<=maxZ;z+=48){ctx.beginPath();ctx.moveTo(minX*scale,z*scale);ctx.lineTo(maxX*scale,z*scale);ctx.stroke();}
+  ctx.lineWidth=2*dpr;ctx.strokeStyle='rgba(84,232,255,.12)';ctx.beginPath();ctx.arc(0,0,310*scale,0,Math.PI*2);ctx.stroke();
+  const dot=(x,z,color,r=7,label='')=>{ctx.fillStyle=color;ctx.beginPath();ctx.arc(x*scale,z*scale,r*dpr,0,Math.PI*2);ctx.fill();if(label&&mapZoom>.75){ctx.fillStyle='#eaf0ff';ctx.font=`${11*dpr}px Segoe UI`;ctx.fillText(label,x*scale+9*dpr,z*scale-8*dpr);}};
+  for(const sp of world.special)dot(sp.x,sp.z,'#54e8ff',6,sp.name);
+  for(const v of commerce.venues)dot(v.pos.x,v.pos.z,v.type==='gunstore'?'#ff5e68':'#6affb0',v.type==='property'&&commerce.isOwned(v.id)?9:6,v.name);
+  const mission=objectiveMarker.visible?objectiveMarker:startMarker.visible?startMarker:null;if(mission)dot(mission.position.x,mission.position.z,mission===startMarker?'#ffd56a':'#54e8ff',10,'MISSION');
+  if(state.waypoint){ctx.strokeStyle='#b56cff';ctx.lineWidth=3*dpr;ctx.setLineDash([9*dpr,7*dpr]);ctx.beginPath();ctx.moveTo(player.position.x*scale,player.position.z*scale);ctx.lineTo(state.waypoint.x*scale,state.waypoint.z*scale);ctx.stroke();ctx.setLineDash([]);dot(state.waypoint.x,state.waypoint.z,'#b56cff',10,'GPS');}
+  dot(player.position.x,player.position.z,'#ffffff',9,'YOU');ctx.restore();
+  ctx.fillStyle='rgba(255,255,255,.68)';ctx.font=`${12*dpr}px Segoe UI`;ctx.fillText(`ZOOM ${mapZoom.toFixed(1)}×  •  ${world.districtAt(player.position.x,player.position.z)}`,16*dpr,24*dpr);
+}
+function mapCoordinateFromEvent(e){const r=dom.worldMap.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*dom.worldMap.width,sy=(e.clientY-r.top)/r.height*dom.worldMap.height,scale=.38*mapZoom*Math.min(devicePixelRatio,2);return{x:(sx-dom.worldMap.width/2)/scale+mapCentre.x,z:(sy-dom.worldMap.height/2)/scale+mapCentre.z};}
 
 // ---------------- Day/night ----------------
 function updateLighting(dt){
@@ -1002,21 +1197,16 @@ function updateLighting(dt){
 }
 
 // ---------------- Save/load ----------------
-function saveGame(){
-  const p=player?.position||new THREE.Vector3(0,1,18);const data={version:state.saveVersion,time:state.time,health:state.health,armor:state.armor,money:state.money,heat:0,weapon:state.weapon,ammo:state.ammo,missionIndex:state.missionIndex,currentMission:state.currentMission,missionStage:state.missionStage,missionData:state.missionData,choice:state.choice,pos:{x:p.x,y:1,z:p.z}};
-  localStorage.setItem('nd_save',JSON.stringify(data));showToast('Game saved');
+function saveGame(notify=true){
+  const p=player?.position||new THREE.Vector3(0,1,18);const data={version:state.saveVersion,time:state.time,health:state.health,armor:state.armor,money:state.money,heat:0,weapon:state.weapon,ammo:state.inventory.pulse?.reserve||0,inventory:state.inventory,ownedProperties:state.ownedProperties,lootedBuildings:state.lootedBuildings,waypoint:state.waypoint,missionIndex:state.missionIndex,currentMission:state.currentMission,missionStage:state.missionStage,missionData:state.missionData,choice:state.choice,pos:{x:p.x,y:1,z:p.z}};
+  localStorage.setItem('nd_save',JSON.stringify(data));if(notify)showToast('Game saved');
 }
 function loadGame(){
-  const d=JSON.parse(localStorage.getItem('nd_save')||'null');if(!d)return false;Object.assign(state,{time:d.time??20.25,health:d.health??100,armor:d.armor??0,money:d.money??500,heat:0,weapon:d.weapon??0,ammo:d.ammo??48,missionIndex:d.missionIndex??0,currentMission:d.currentMission||null,missionStage:d.missionStage??0,missionData:d.missionData||{},choice:d.choice||null});
-  player.group.position.set(d.pos?.x||0,1,d.pos?.z||18);if(state.currentMission){missions.beginStage();}else missions.refreshMarkers();updateHud();return true;
+  const d=JSON.parse(localStorage.getItem('nd_save')||'null');if(!d)return false;const inv=freshInventory();if(d.inventory){for(const k of Object.keys(inv))Object.assign(inv[k],d.inventory[k]||{});}else if(d.ammo!=null){inv.pulse.reserve=d.ammo;}
+  Object.assign(state,{time:d.time??20.25,health:d.health??100,armor:d.armor??0,money:d.money??500,heat:0,weapon:d.weapon??0,ammo:d.ammo??48,inventory:inv,ownedProperties:d.ownedProperties||[],lootedBuildings:d.lootedBuildings||[],waypoint:d.waypoint||null,missionIndex:d.missionIndex??0,currentMission:d.currentMission||null,missionStage:d.missionStage??0,missionData:d.missionData||{},choice:d.choice||null,inInterior:null});
+  player.group.position.set(d.pos?.x||0,1,d.pos?.z||18);switchWeapon(state.inventory[WEAPONS[state.weapon]?.id]?.owned?state.weapon:0);if(state.currentMission){missions.beginStage();}else missions.refreshMarkers();updateHud();return true;
 }
-function newGame(){localStorage.removeItem('nd_save');Object.assign(state,{time:20.25,health:100,armor:0,money:500,heat:0,weapon:0,ammo:48,missionIndex:0,currentMission:null,missionStage:0,missionData:{},choice:null,inInterior:null});player.exitVehicle(true);player.group.position.set(0,1,18);missions.refreshMarkers();updateHud();}
-
-// ---------------- Settings ----------------
-const settingEls={preset:$('qualityPreset'),renderScale:$('renderScale'),drawDistance:$('drawDistance'),pedestrians:$('pedestrians'),traffic:$('traffic'),shadows:$('shadows'),weatherFx:$('weatherFx'),infiniteDay:$('infiniteDay'),timeSpeed:$('timeSpeed'),sensitivity:$('sensitivity')};
-function loadSettingsUI(){
-  settingEls.preset.value=settings.preset;settingEls.renderScale.value=settings.renderScale;settingEls.drawDistance.value=settings.drawDistance;settingEls.pedestrians.value=settings.pedestrians;settingEls.traffic.value=settings.traffic;settingEls.shadows.checked=settings.shadows;settingEls.weatherFx.checked=settings.weatherFx;settingEls.infiniteDay.checked=settings.infiniteDay;settingEls.timeSpeed.value=settings.timeSpeed;settingEls.sensitivity.value=settings.sensitivity;updateSettingLabels();
-}
+function newGame(){localStorage.removeItem('nd_save');Object.assign(state,{time:20.25,health:100,armor:0,money:500,heat:0,weapon:0,ammo:48,inventory:freshInventory(),ownedProperties:[],lootedBuildings:[],waypoint:null,missionIndex:0,currentMission:null,missionStage:0,missionData:{},choice:null,inInterior:null});player.exitVehicle(true);player.group.position.set(0,1,18);switchWeapon(0);missions.refreshMarkers();updateHud();}
 function updateSettingLabels(){$('renderScaleValue').textContent=settingEls.renderScale.value+'%';$('drawDistanceValue').textContent=settingEls.drawDistance.value;$('pedValue').textContent=settingEls.pedestrians.value;$('trafficValue').textContent=settingEls.traffic.value;$('timeSpeedValue').textContent=settingEls.timeSpeed.value+'×';$('sensitivityValue').textContent=Number(settingEls.sensitivity.value).toFixed(1);}
 function applyPreset(name){const presets={potato:{renderScale:55,drawDistance:1,pedestrians:6,traffic:5,shadows:false,weatherFx:false},low:{renderScale:70,drawDistance:1,pedestrians:14,traffic:10,shadows:false,weatherFx:true},medium:{renderScale:90,drawDistance:2,pedestrians:28,traffic:20,shadows:true,weatherFx:true},high:{renderScale:105,drawDistance:3,pedestrians:40,traffic:28,shadows:true,weatherFx:true},ultra:{renderScale:120,drawDistance:4,pedestrians:58,traffic:42,shadows:true,weatherFx:true}};Object.assign(settings,presets[name],{preset:name});loadSettingsUI();}
 function saveSettings(){
@@ -1028,26 +1218,26 @@ function closeSettings(){saveSettings();dom.settings.classList.add('hidden');if(
 
 // ---------------- Game state ----------------
 function startGame(load=false){audio.init();dom.start.classList.add('hidden');dom.hud.classList.remove('hidden');state.title=false;state.running=true;state.paused=false;if(load){if(!loadGame())newGame();}else newGame();renderer.domElement.requestPointerLock();if(!localStorage.getItem('nd_helped'))dom.help.classList.remove('hidden');}
-function pauseGame(on=true){if(!state.running)return;state.paused=on;dom.pause.classList.toggle('hidden',!on);if(on)document.exitPointerLock();else renderer.domElement.requestPointerLock();}
+function pauseGame(on=true){if(!state.running||state.mapOpen||state.commerceOpen)return;state.paused=on;dom.pause.classList.toggle('hidden',!on);if(on)document.exitPointerLock();else renderer.domElement.requestPointerLock();}
 function quitToTitle(){saveGame();state.running=false;state.paused=false;state.title=true;dom.pause.classList.add('hidden');dom.hud.classList.add('hidden');dom.start.classList.remove('hidden');document.exitPointerLock();}
 
 // ---------------- Inputs ----------------
 addEventListener('keydown',e=>{
-  keys[e.code]=true;if(e.code==='Escape'&&state.running){if(!dom.settings.classList.contains('hidden'))closeSettings();else pauseGame(!state.paused);}
+  keys[e.code]=true;if(e.code==='Escape'&&state.running){if(state.mapOpen){closeFullMap();return;}if(state.commerceOpen){closeCommerce();return;}if(!dom.settings.classList.contains('hidden'))closeSettings();else pauseGame(!state.paused);}
+  if(e.code==='KeyM'&&state.running&&!state.commerceOpen){if(state.mapOpen)closeFullMap();else openFullMap(state.paused);return;}
   if(!state.running||state.paused)return;
   if(e.code==='KeyE')interact();
   if(e.code==='KeyF'){if(player.inCar)player.exitVehicle();else{const c=traffic.nearest(player.position,4.6);if(c)player.enterVehicle(c);}}
   if(e.code==='KeyU')player.unstuck();
   if(e.code==='KeyQ')player.punch();
-  if(e.code==='Digit1'){state.weapon=0;dom.crosshair.classList.add('hidden');updateHud();}
-  if(e.code==='Digit2'){state.weapon=1;dom.crosshair.classList.remove('hidden');updateHud();}
-  if(e.code==='KeyR'&&state.weapon===1&&state.ammo<48){state.ammo=48;showToast('Pulse emitter recharged');audio.beep(220,.08,'square',.06);updateHud();}
+  if(/^Digit[1-6]$/.test(e.code))switchWeapon(Number(e.code.slice(-1))-1);
+  if(e.code==='KeyR')reloadWeapon();
 });
 addEventListener('keyup',e=>keys[e.code]=false);
 addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){mouse.dx+=e.movementX;mouse.dy+=e.movementY;}});
 addEventListener('mousedown',e=>{if(e.button===0){mouse.down=true;if(state.running&&!state.paused&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock();}});
 addEventListener('mouseup',e=>{if(e.button===0)mouse.down=false;});
-addEventListener('wheel',e=>{if(player&&!player.inCar)player.camDist=clamp(player.camDist+e.deltaY*.006,3.5,10);});
+addEventListener('wheel',e=>{if(state.running&&!state.paused&&!state.mapOpen){if(e.shiftKey)cycleWeapon(e.deltaY>0?1:-1);else if(player&&!player.inCar)player.camDist=clamp(player.camDist+e.deltaY*.006,3.5,10);}});
 document.addEventListener('pointerlockchange',()=>state.pointer=document.pointerLockElement===renderer.domElement);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
@@ -1055,7 +1245,7 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 function animate(){
   requestAnimationFrame(animate);let dt=Math.min(.05,clock.getDelta());
   if(state.running&&!state.paused){
-    state.gameTime+=dt;player.update(dt);traffic.update(dt);pedestrians.update(dt);police.update(dt);updatePrompt();missions.update(dt);weather.update(dt);updateLighting(dt);updateClockAndDistrict();updateSpeed();drawMinimap();
+    state.gameTime+=dt;player.update(dt);traffic.update(dt);pedestrians.update(dt);police.update(dt);commerce.update(dt);updatePrompt();missions.update(dt);weather.update(dt);updateLighting(dt);updateClockAndDistrict();updateSpeed();drawMinimap();
     objectiveMarker.userData.animate(state.gameTime);startMarker.userData.animate(state.gameTime);
     if(toastTimer>0&&(toastTimer-=dt)<=0)dom.toast.classList.remove('show');if(bannerTimer>0&&(bannerTimer-=dt)<=0)dom.banner.classList.remove('show');
     updateHud();
@@ -1065,12 +1255,14 @@ function animate(){
 
 // ---------------- Boot ----------------
 function boot(){
-  initThree();world=new WorldManager();interiors=new InteriorManager();player=new Player();traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateObjectiveMarker();
+  initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();player=new Player();traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateObjectiveMarker();
   setTimeout(()=>{dom.loading.classList.add('hidden');dom.start.classList.remove('hidden');},500);animate();
 }
 
 // Buttons
-$('newGameBtn').onclick=()=>startGame(false);$('continueBtn').onclick=()=>startGame(true);$('startSettingsBtn').onclick=openSettings;$('pauseSettingsBtn').onclick=openSettings;$('resumeBtn').onclick=()=>pauseGame(false);$('saveBtn').onclick=saveGame;$('quitBtn').onclick=quitToTitle;$('closeSettingsBtn').onclick=closeSettings;$('resetSettingsBtn').onclick=()=>{settings={...DEFAULT_SETTINGS};loadSettingsUI();};$('closeHelp').onclick=()=>{dom.help.classList.add('hidden');localStorage.setItem('nd_helped','1');renderer.domElement.requestPointerLock();};
+$('newGameBtn').onclick=()=>startGame(false);$('continueBtn').onclick=()=>startGame(true);$('startSettingsBtn').onclick=openSettings;$('pauseSettingsBtn').onclick=openSettings;$('openMapBtn').onclick=()=>openFullMap(true);$('resumeBtn').onclick=()=>pauseGame(false);$('saveBtn').onclick=saveGame;$('quitBtn').onclick=quitToTitle;$('closeSettingsBtn').onclick=closeSettings;$('resetSettingsBtn').onclick=()=>{settings={...DEFAULT_SETTINGS};loadSettingsUI();};$('closeHelp').onclick=()=>{dom.help.classList.add('hidden');localStorage.setItem('nd_helped','1');renderer.domElement.requestPointerLock();};
+$('closeMapBtn').onclick=closeFullMap;$('mapZoomIn').onclick=()=>{mapZoom=clamp(mapZoom*1.25,.45,3.2);drawWorldMap();};$('mapZoomOut').onclick=()=>{mapZoom=clamp(mapZoom/1.25,.45,3.2);drawWorldMap();};$('mapCenter').onclick=()=>{mapCentre={x:player.position.x,z:player.position.z};drawWorldMap();};$('closeCommerceBtn').onclick=closeCommerce;
+dom.worldMap.addEventListener('click',e=>{state.waypoint=mapCoordinateFromEvent(e);showToast('GPS waypoint placed');drawWorldMap();saveGame(false);});dom.worldMap.addEventListener('contextmenu',e=>{e.preventDefault();state.waypoint=null;drawWorldMap();saveGame(false);});
 settingEls.preset.onchange=()=>applyPreset(settingEls.preset.value);Object.values(settingEls).forEach(el=>el.addEventListener('input',updateSettingLabels));
 
 if(window.THREE){boot();}else{dom.loading.innerHTML='<div style="max-width:650px;padding:30px;text-align:center"><h2>Three.js could not load</h2><p>Connect to the internet, refresh the page, or upload this file to GitHub Pages. The game itself is contained in this HTML, while its 3D engine loads from a trusted CDN.</p></div>';}
