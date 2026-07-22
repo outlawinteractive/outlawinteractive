@@ -20,6 +20,7 @@
   html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#02030a; color:var(--text); font-family:Inter,Segoe UI,Arial,sans-serif; }
   canvas { display:block; }
   button, select, input { font:inherit; }
+  button:disabled { opacity:.45; cursor:not-allowed; filter:grayscale(.35); }
   .hidden { display:none !important; }
   .glass {
     background:linear-gradient(145deg,rgba(19,25,46,.86),rgba(4,7,16,.68));
@@ -55,6 +56,8 @@
   .secondary { color:var(--text); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.12); }
   .dangerBtn { color:white; background:linear-gradient(135deg,#ff4655,#9d182d); }
   .primary:hover,.secondary:hover,.dangerBtn:hover { transform:translateY(-2px); filter:brightness(1.08); }
+  #engineStatus { margin-top:16px; min-height:20px; color:var(--cyan); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  #engineStatus.error { color:var(--danger); }
   .controlsHint { margin-top:26px; color:#8f99b4; font-size:13px; display:flex; gap:16px; flex-wrap:wrap; }
   kbd { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.08); border-radius:6px; padding:3px 7px; color:white; }
 
@@ -105,10 +108,6 @@
   #dialogueText { margin-top:7px; font-size:16px; line-height:1.5; }
   #dialogueNext { margin-top:8px; color:#8f99af; font-size:11px; text-transform:uppercase; letter-spacing:.12em; }
   #damageFlash { position:absolute; inset:0; background:radial-gradient(circle,transparent 40%,rgba(255,0,45,.42)); opacity:0; transition:opacity .12s; }
-  #loading { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:#02030a; }
-  .loader { width:58px; height:58px; border-radius:50%; border:4px solid rgba(255,255,255,.12); border-top-color:var(--cyan); animation:spin 1s linear infinite; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-
   #pauseScreen { z-index:60; background:rgba(2,3,10,.84); }
   .pauseCard, .settingsCard { width:min(620px,92vw); border-radius:24px; padding:30px; }
   .pauseCard h2, .settingsCard h2 { margin:0 0 18px; font-size:32px; }
@@ -124,10 +123,26 @@
   .settingsFooter { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
   #helpPanel { position:fixed; z-index:40; right:18px; bottom:18px; width:min(390px,88vw); padding:17px; border-radius:18px; }
   #fullMapScreen, #commercePanel { position:fixed; inset:0; z-index:80; display:grid; place-items:center; background:rgba(1,3,9,.94); padding:22px; }
-  .mapCard { width:min(1180px,96vw); height:min(820px,92vh); border-radius:24px; padding:18px; display:grid; grid-template-rows:auto 1fr auto; gap:12px; }
+  .mapCard { width:min(1280px,97vw); height:min(840px,94vh); border-radius:24px; padding:18px; display:grid; grid-template-rows:auto minmax(0,1fr) auto; gap:12px; }
   .mapHeader, .panelHeader { display:flex; align-items:center; justify-content:space-between; gap:14px; }
   .mapHeader h2, .panelHeader h2 { margin:0; font-size:28px; }
   .mapControls { display:flex; gap:8px; flex-wrap:wrap; }
+  .mapBody { min-height:0; display:grid; grid-template-columns:285px minmax(0,1fr); gap:12px; }
+  .poiSidebar { min-height:0; display:flex; flex-direction:column; gap:10px; padding:12px; border-radius:16px; background:rgba(4,8,18,.8); border:1px solid rgba(255,255,255,.1); }
+  .poiSidebar h3 { margin:0; font-size:17px; }
+  .poiHint { color:#9ea9bf; font-size:11px; line-height:1.35; }
+  #poiSearch { width:100%; box-sizing:border-box; padding:10px 11px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0c1220; color:#fff; outline:none; }
+  #poiSearch:focus { border-color:#54e8ff; box-shadow:0 0 0 2px rgba(84,232,255,.14); }
+  .poiTabs { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+  .poiTab { padding:8px 7px; border-radius:9px; background:rgba(255,255,255,.055); color:#c8d0df; border:1px solid rgba(255,255,255,.08); font-size:11px; }
+  .poiTab.active { color:#061019; background:#54e8ff; border-color:#54e8ff; }
+  #poiList { min-height:0; overflow:auto; display:grid; align-content:start; gap:7px; padding-right:3px; }
+  .poiItem { width:100%; text-align:left; padding:10px; border-radius:11px; color:#edf4ff; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08); cursor:pointer; }
+  .poiItem:hover, .poiItem:focus { border-color:rgba(84,232,255,.65); background:rgba(84,232,255,.1); }
+  .poiItem strong { display:block; font-size:12px; margin-bottom:4px; }
+  .poiMeta { display:flex; justify-content:space-between; gap:8px; color:#9faabd; font-size:10px; }
+  .poiBadge { display:inline-block; margin-top:5px; color:#54e8ff; font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+  .mapCanvasWrap { min-width:0; min-height:0; position:relative; }
   #worldMap { width:100%; height:100%; min-height:350px; border-radius:16px; background:#050813; border:1px solid rgba(255,255,255,.13); cursor:crosshair; }
   .mapFooter { display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; color:#aeb7cc; font-size:12px; }
   .mapLegend { display:flex; gap:14px; flex-wrap:wrap; }
@@ -150,24 +165,27 @@
     #minimapFrame { width:145px; height:145px; }
     #healthWrap { bottom:125px; width:180px; }
     #weaponSlots { right:8px; bottom:8px; transform:scale(.8); transform-origin:right bottom; }
-    .mapCard { padding:10px; height:96vh; }
+    .mapCard { padding:10px; height:97vh; }
     .mapHeader h2 { font-size:21px; }
+    .mapBody { grid-template-columns:1fr; grid-template-rows:auto minmax(330px,1fr); }
+    .poiSidebar { max-height:235px; }
+    .poiTabs { grid-template-columns:repeat(5,1fr); }
+    .poiTab { font-size:9px; padding:7px 3px; }
   }
 </style>
 </head>
 <body>
-<div id="loading"><div><div class="loader"></div><p style="color:#9fa8bd;text-align:center">Building Crown City…</p></div></div>
-
-<div id="startScreen" class="hidden">
+<div id="startScreen">
   <div class="titleCard glass">
     <div class="eyebrow">An original open-world browser game</div>
     <h1>Neon <span>Dominion</span></h1>
     <div class="subtitle">Crown City is a place where desert casinos meet ocean boulevards. Play as Kai Mercer, a getaway driver pulled into a fight for the city’s future.</div>
     <div class="menuRow">
-      <button class="primary" id="newGameBtn">New Game</button>
-      <button class="secondary" id="continueBtn">Continue</button>
-      <button class="secondary" id="startSettingsBtn">Settings</button>
+      <button class="primary" id="newGameBtn" disabled>New Game</button>
+      <button class="secondary" id="continueBtn" disabled>Continue</button>
+      <button class="secondary" id="startSettingsBtn" disabled>Settings</button>
     </div>
+    <div id="engineStatus">Starting 3D engine…</div>
     <div class="controlsHint">
       <span><kbd>WASD</kbd> move</span><span><kbd>Shift</kbd> sprint</span><span><kbd>F</kbd> vehicle</span><span><kbd>E</kbd> interact</span><span><kbd>M</kbd> city map</span><span><kbd>1–6</kbd> weapons</span><span><kbd>U</kbd> unstuck</span><span><kbd>Esc</kbd> pause</span>
     </div>
@@ -249,8 +267,22 @@
       <div><div class="eyebrow">Crown City navigation network</div><h2>City Map</h2></div>
       <div class="mapControls"><button class="secondary" id="mapZoomOut">−</button><button class="secondary" id="mapCenter">Centre</button><button class="secondary" id="mapZoomIn">+</button><button class="primary" id="closeMapBtn">Close</button></div>
     </div>
-    <canvas id="worldMap" width="1100" height="680"></canvas>
-    <div class="mapFooter"><div>Click anywhere to place a purple GPS waypoint. Right-click to clear it.</div><div class="mapLegend"><span><i class="legendDot" style="background:#54e8ff"></i>Mission</span><span><i class="legendDot" style="background:#ffd56a"></i>Story start</span><span><i class="legendDot" style="background:#ff5e68"></i>Gun store</span><span><i class="legendDot" style="background:#6affb0"></i>Property</span><span><i class="legendDot" style="background:#b56cff"></i>Waypoint</span></div></div>
+    <div class="mapBody">
+      <aside class="poiSidebar" aria-label="Places of interest">
+        <div><h3>Places</h3><div class="poiHint">Choose a location to centre it and pin a GPS route.</div></div>
+        <input id="poiSearch" type="search" placeholder="Search Crown City…" autocomplete="off">
+        <div class="poiTabs" aria-label="Place categories">
+          <button class="poiTab active" data-poi-filter="all">All</button>
+          <button class="poiTab" data-poi-filter="landmark">Landmarks</button>
+          <button class="poiTab" data-poi-filter="store">Shops</button>
+          <button class="poiTab" data-poi-filter="property">Homes</button>
+          <button class="poiTab" data-poi-filter="story">Story</button>
+        </div>
+        <div id="poiList"></div>
+      </aside>
+      <div class="mapCanvasWrap"><canvas id="worldMap" width="1100" height="680"></canvas></div>
+    </div>
+    <div class="mapFooter"><div>Choose a place on the left or click the map to place a purple GPS waypoint. Right-click to clear it.</div><div class="mapLegend"><span><i class="legendDot" style="background:#54e8ff"></i>Mission</span><span><i class="legendDot" style="background:#ffd56a"></i>Landmark</span><span><i class="legendDot" style="background:#ff5e68"></i>Gun store</span><span><i class="legendDot" style="background:#6affb0"></i>Property</span><span><i class="legendDot" style="background:#b56cff"></i>Waypoint</span></div></div>
   </div>
 </div>
 
@@ -268,9 +300,50 @@
   <button id="closeHelp" class="secondary" style="margin-top:12px;pointer-events:auto">Got it</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<script>if(!window.THREE){document.write('<script src="https://unpkg.com/three@0.158.0/build/three.min.js"><\/script>')}</script>
-<script>if(!window.THREE){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"><\/script>')}</script>
+<script>
+window.__threeReady = new Promise((resolve, reject) => {
+  const sources = [
+    'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js',
+    'https://unpkg.com/three@0.158.0/build/three.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js'
+  ];
+  let finished = false;
+  let failed = 0;
+  const timeout = setTimeout(() => {
+    if (!finished) {
+      finished = true;
+      reject(new Error('The 3D engine connection timed out.'));
+    }
+  }, 12000);
+  const failOne = () => {
+    failed += 1;
+    if (!finished && failed >= sources.length) {
+      finished = true;
+      clearTimeout(timeout);
+      reject(new Error('The 3D engine could not be downloaded.'));
+    }
+  };
+  requestAnimationFrame(() => {
+    for (const src of sources) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      script.onload = () => {
+        if (!finished && window.THREE) {
+          finished = true;
+          clearTimeout(timeout);
+          resolve(window.THREE);
+        } else if (!window.THREE) {
+          failOne();
+        }
+      };
+      script.onerror = failOne;
+      document.head.appendChild(script);
+    }
+  });
+});
+</script>
 <script>
 (() => {
 'use strict';
@@ -289,6 +362,11 @@ const rand = (a=0,b=1) => a+Math.random()*(b-a);
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 const dist2D = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 const formatMoney = n => '$'+Math.max(0,Math.floor(n)).toString().padStart(6,'0');
+const storage = {
+  get(key, fallback=null){ try { const value=window.localStorage.getItem(key); return value===null?fallback:value; } catch(error){ return fallback; } },
+  set(key, value){ try { window.localStorage.setItem(key,value); return true; } catch(error){ return false; } },
+  remove(key){ try { window.localStorage.removeItem(key); return true; } catch(error){ return false; } }
+};
 
 const WEAPONS = [
   {slot:0,id:'fists',name:'Unarmed',short:'FISTS',price:0,damage:32,fireRate:.45,range:2.2,spread:0,pellets:1,clipSize:0,ammoPack:0,ammoPrice:0,heat:.7},
@@ -313,7 +391,14 @@ const DEFAULT_SETTINGS = {
   preset:'medium', renderScale:100, drawDistance:2, pedestrians:28, traffic:20,
   shadows:true, weatherFx:true, infiniteDay:false, timeSpeed:1, sensitivity:1
 };
-let settings = {...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem('nd_settings')||'{}')};
+let savedSettings = {};
+try {
+  savedSettings = JSON.parse(storage.get('nd_settings','{}') || '{}') || {};
+} catch (error) {
+  storage.remove('nd_settings');
+  savedSettings = {};
+}
+let settings = {...DEFAULT_SETTINGS, ...savedSettings};
 
 const state = {
   running:false, paused:false, title:true, dialog:false, pointer:false, mapOpen:false, commerceOpen:false, mapFromPause:false,
@@ -324,13 +409,20 @@ const state = {
 };
 
 const dom = {
-  loading:$('loading'), start:$('startScreen'), hud:$('hud'), pause:$('pauseScreen'), settings:$('settingsPanel'),
+  start:$('startScreen'), hud:$('hud'), pause:$('pauseScreen'), settings:$('settingsPanel'), engineStatus:$('engineStatus'),
   missionTitle:$('missionTitle'), missionObjective:$('missionObjective'), missionProgress:$('missionProgress'),
   wanted:$('wanted'), money:$('money'), district:$('district'), clock:$('clock'), healthFill:$('healthFill'),
   healthText:$('healthText'), armorFill:$('armorFill'), armorText:$('armorText'), weapon:$('weapon'),
   speed:$('speedometer'), map:$('minimap'), crosshair:$('crosshair'), prompt:$('prompt'), toast:$('toast'), weaponSlots:$('weaponSlots'),
   banner:$('missionBanner'), dialogue:$('dialogue'), speaker:$('speaker'), dialogueText:$('dialogueText'), damage:$('damageFlash'), help:$('helpPanel'),
-  fullMap:$('fullMapScreen'), worldMap:$('worldMap'), commerce:$('commercePanel'), commerceTitle:$('commerceTitle'), commerceDescription:$('commerceDescription'), commerceItems:$('commerceItems'), commerceEyebrow:$('commerceEyebrow')
+  fullMap:$('fullMapScreen'), worldMap:$('worldMap'), poiSearch:$('poiSearch'), poiList:$('poiList'), poiTabs:[...document.querySelectorAll('.poiTab')],
+  commerce:$('commercePanel'), commerceTitle:$('commerceTitle'), commerceDescription:$('commerceDescription'), commerceItems:$('commerceItems'), commerceEyebrow:$('commerceEyebrow')
+};
+
+const settingEls = {
+  preset:$('qualityPreset'), renderScale:$('renderScale'), drawDistance:$('drawDistance'),
+  pedestrians:$('pedestrians'), traffic:$('traffic'), shadows:$('shadows'),
+  weatherFx:$('weatherFx'), infiniteDay:$('infiniteDay'), timeSpeed:$('timeSpeed'), sensitivity:$('sensitivity')
 };
 
 // ---------------- Audio synthesiser ----------------
@@ -436,15 +528,43 @@ function createCharacterMesh(opts={}){
   const head=new THREE.Mesh(new THREE.SphereGeometry(.28,16,12),matSkin);head.position.y=2.22;head.castShadow=true;g.add(head);
   const hairMesh=new THREE.Mesh(new THREE.SphereGeometry(.287,12,8,0,Math.PI*2,0,Math.PI*.48),matHair);hairMesh.position.set(0,2.29,0);hairMesh.castShadow=true;g.add(hairMesh);
   const eyeMat=new THREE.MeshBasicMaterial({color:0x101018});
-  [-.09,.09].forEach(x=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.025,6,4),eyeMat);e.position.set(x,2.25,.264);g.add(e);});
-  const mouth=new THREE.Mesh(new THREE.BoxGeometry(.1,.018,.018),new THREE.MeshBasicMaterial({color:0x5d242b}));mouth.position.set(0,2.12,.276);g.add(mouth);
+  const faceParts=[];
+  [-.09,.09].forEach(x=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.025,6,4),eyeMat);e.position.set(x,2.25,.264);g.add(e);faceParts.push(e);});
+  const mouth=new THREE.Mesh(new THREE.BoxGeometry(.1,.018,.018),new THREE.MeshBasicMaterial({color:0x5d242b}));mouth.position.set(0,2.12,.276);g.add(mouth);faceParts.push(mouth);
   const limbGeo=new THREE.CapsuleGeometry(.09,.58,3,6);
   const armL=new THREE.Mesh(limbGeo,matSkin),armR=armL.clone();armL.position.set(-.42,1.45,0);armR.position.set(.42,1.45,0);armL.castShadow=armR.castShadow=true;g.add(armL,armR);
   const legGeo=new THREE.CapsuleGeometry(.11,.68,3,6);
   const legL=new THREE.Mesh(legGeo,matPants),legR=legL.clone();legL.position.set(-.17,.55,0);legR.position.set(.17,.55,0);legL.castShadow=legR.castShadow=true;g.add(legL,legR);
-  g.userData.parts={armL,armR,legL,legR,head};
-  g.userData.animate=(speed,t)=>{const s=Math.sin(t*9)*Math.min(1,speed/4);armL.rotation.x=s;armR.rotation.x=-s;legL.rotation.x=-s;legR.rotation.x=s;};
+  g.userData.parts={armL,armR,legL,legR,head,torso,hair:hairMesh,faceParts};
+  g.userData.action={type:'idle',start:0,duration:0};
+  g.userData.playAction=(type,duration=.38)=>{g.userData.action={type,start:state.gameTime,duration};};
+  g.userData.animate=(speed,t)=>{
+    const walk=Math.sin(t*9)*Math.min(1,speed/4);
+    armL.rotation.set(walk,0,0);armR.rotation.set(-walk,0,0);legL.rotation.set(-walk,0,0);legR.rotation.set(walk,0,0);torso.rotation.set(0,0,0);
+    torso.position.y=1.45;armL.position.y=armR.position.y=1.45;
+    let a=g.userData.action;
+    if(a.type!=='idle'&&t-a.start>=a.duration){g.userData.action={type:'idle',start:t,duration:0};a=g.userData.action;}
+    if(a.type!=='idle'){
+      const q=clamp((t-a.start)/Math.max(.01,a.duration),0,1),pulse=Math.sin(q*Math.PI);
+      if(a.type==='punch'||a.type==='attack'){
+        const wind=q<.28?q/.28:Math.max(0,1-(q-.28)/.72);
+        armR.rotation.x=-2.45*wind;armR.rotation.z=-.22*wind;armL.rotation.x=.45*wind;torso.rotation.y=-.38*wind;torso.rotation.z=.08*wind;
+      }else if(a.type==='hurt'){
+        torso.rotation.x=.32*pulse;torso.rotation.z=.24*pulse;armL.rotation.x=-.85*pulse;armR.rotation.x=-1.05*pulse;legL.rotation.x=.18*pulse;legR.rotation.x=-.18*pulse;torso.position.y=1.45-.1*pulse;
+      }else if(a.type==='shoot'){
+        armR.rotation.x=-.48*pulse;armL.rotation.x=-.18*pulse;torso.rotation.x=-.1*pulse;
+      }else if(a.type==='getup'){
+        torso.rotation.x=-.35*(1-q);armL.rotation.x=-.8*(1-q);armR.rotation.x=-.8*(1-q);
+      }
+    }
+  };
   return g;
+}
+
+function flashCharacter(mesh,color=0xff6a72){
+  const changed=[];
+  mesh.traverse(o=>{const mats=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of mats){if(m&&m.emissive){changed.push([m,m.emissive.getHex(),m.emissiveIntensity||0]);m.emissive.setHex(color);m.emissiveIntensity=.65;}}});
+  setTimeout(()=>{for(const [m,c,i] of changed){if(m){m.emissive.setHex(c);m.emissiveIntensity=i;}}},110);
 }
 
 function createHeldWeaponModel(slot){
@@ -600,6 +720,7 @@ class WorldManager {
     this.addLandmark('RED MESA DEPOT',new THREE.Vector3(-620,0,36),40,0xff7a40,'depot',22);
     this.addLandmark('AZURE MARINA',new THREE.Vector3(642,0,-42),42,0x47e7ff,'marina',18);
     this.addLandmark('SOLARIA ESTATE',new THREE.Vector3(130,0,660),44,0xffd16b,'estate',24);
+    this.addLandmark('CITY OF SECOND CHANCES',new THREE.Vector3(286,0,272),38,0x6affb0,'secondchance',42);
   }
   addLandmark(name,pos,radius,color,id,height=35){
     const g=new THREE.Group();g.position.copy(pos);
@@ -621,7 +742,7 @@ class InteriorManager {
   createRooms(){
     const defs=[
       ['casino','Vanta Casino',0x9a39ff,'casino'],['club','Pulse Club',0xff3b9f,'club'],['safehouse','Kai Safehouse',0x43dfff,'property'],['garage','Orbit Garage',0xffa64d,'garage'],
-      ['tower','Crown Tower',0x55eeff,'office'],['harbor','Harbor Warehouse',0x4f7cff,'storage'],['depot','Red Mesa Depot',0xff6a36,'storage'],['marina','Azure Marina Office',0x35dfff,'office'],['estate','Solaria Estate',0xffd15a,'property'],
+      ['tower','Crown Tower',0x55eeff,'office'],['harbor','Harbor Warehouse',0x4f7cff,'storage'],['depot','Red Mesa Depot',0xff6a36,'storage'],['marina','Azure Marina Office',0x35dfff,'office'],['estate','Solaria Estate',0xffd15a,'property'],['secondchance','Second Chance Hall',0x6affb0,'lobby'],
       ['generic_lobby','Building Lobby',0x55dfff,'lobby'],['generic_office','Office Floor',0x65b8ff,'office'],['generic_apartment','Private Apartment',0xffc66b,'apartment'],['generic_shop','Retail Interior',0xff67b8,'shop'],['generic_storage','Service Basement',0xff8b52,'storage'],
       ['gunshop','Ammunation Works',0xff5e68,'gunshop'],['property_room','Owned Residence',0x6affb0,'property']
     ];
@@ -669,12 +790,12 @@ class InteriorManager {
 class Player {
   constructor(){
     this.group=createCharacterMesh({shirt:0x1e8fb7,pants:0x161a24,hair:0x23150f,skin:0xb97850});this.group.position.set(0,1,18);scene.add(this.group);
-    this.velocity=new THREE.Vector3();this.yaw=0;this.pitch=.22;this.onGround=true;this.inCar=null;this.camDist=6.4;this.fireCooldown=0;this.punchCooldown=0;this.reloading=false;
+    this.velocity=new THREE.Vector3();this.yaw=0;this.pitch=.22;this.onGround=true;this.inCar=null;this.camDist=6.4;this.fireCooldown=0;this.punchCooldown=0;this.reloading=false;this.hurtShake=0;
     this.weaponModel=createHeldWeaponModel(0);this.group.userData.parts.armR.add(this.weaponModel);this.lastPos=this.group.position.clone();
   }
   get position(){return this.inCar?this.inCar.mesh.position:this.group.position;}
   update(dt){
-    this.fireCooldown=Math.max(0,this.fireCooldown-dt);this.punchCooldown=Math.max(0,this.punchCooldown-dt);
+    this.fireCooldown=Math.max(0,this.fireCooldown-dt);this.punchCooldown=Math.max(0,this.punchCooldown-dt);this.hurtShake=Math.max(0,this.hurtShake-dt);
     if(state.dialog||state.paused||!state.running)return;
     if(this.inCar)this.updateDriving(dt);else this.updateWalking(dt);
     this.updateCamera(dt);
@@ -719,6 +840,7 @@ class Player {
   updateCamera(dt){
     const p=this.position;const carOffset=this.inCar?2.8:2.1;const dist=this.inCar?9.5:this.camDist;
     const desired=new THREE.Vector3(p.x-Math.sin(this.yaw)*Math.cos(this.pitch)*dist,p.y+carOffset+Math.sin(this.pitch)*dist,p.z-Math.cos(this.yaw)*Math.cos(this.pitch)*dist);
+    if(this.hurtShake>0)desired.add(new THREE.Vector3(rand(-.1,.1),rand(-.06,.08),rand(-.1,.1)).multiplyScalar(this.hurtShake*5));
     camera.position.lerp(desired,1-Math.pow(.0008,dt));camera.lookAt(p.x,p.y+carOffset*.65,p.z);
   }
   enterVehicle(car){
@@ -739,13 +861,14 @@ class Player {
       const hits=raycaster.intersectObjects(targets,true);let end=origin.clone().add(dir.clone().multiplyScalar(hits.length?hits[0].distance:w.range));if(!firstEnd)firstEnd=end;
       if(hits.length){let o=hits[0].object;while(o.parent&&!o.userData.npcRef)o=o.parent;const n=o.userData.npcRef||hits[0].object.userData.npcRef;if(n){n.hit(w.damage,'shot');hitSomeone=true;missions.event('enemyHit',{npc:n});}}
     }
-    if(firstEnd)createMuzzleTrace(origin,firstEnd);addHeat(hitSomeone?w.heat:w.heat*.35);this.weaponModel.rotation.z=rand(-.06,.06);setTimeout(()=>{if(this.weaponModel)this.weaponModel.rotation.z=0;},65);updateHud();
+    if(firstEnd)createMuzzleTrace(origin,firstEnd);addHeat(hitSomeone?w.heat:w.heat*.35);this.group.userData.playAction('shoot',Math.max(.1,w.fireRate*.75));this.weaponModel.rotation.z=rand(-.06,.06);setTimeout(()=>{if(this.weaponModel)this.weaponModel.rotation.z=0;},65);updateHud();
   }
   punch(){
-    if(this.inCar||this.punchCooldown>0)return;this.punchCooldown=.45;const near=pedestrians.nearest(this.group.position,2.1);if(near){near.hit(32,'punch');addHeat(.7);audio.beep(120,.06,'square',.08);}this.group.userData.parts.armR.rotation.x=-1.5;setTimeout(()=>{if(this.group)this.group.userData.parts.armR.rotation.x=0;},180);
+    if(this.inCar||this.punchCooldown>0)return;this.punchCooldown=.55;this.group.userData.playAction('punch',.42);audio.beep(95,.05,'square',.055);
+    const near=pedestrians.nearest(this.group.position,2.55);if(near)setTimeout(()=>{if(!near.down&&dist2D(this.group.position,near.mesh.position)<3){near.hit(32,'punch');addHeat(.7);audio.beep(120,.06,'square',.08);}},115);
   }
   damage(amount){
-    if(state.armor>0){const take=Math.min(state.armor,amount);state.armor-=take;amount-=take;}state.health=clamp(state.health-amount,0,100);dom.damage.style.opacity=.85;setTimeout(()=>dom.damage.style.opacity=0,110);updateHud();if(state.health<=0)this.respawn();
+    const raw=amount;if(state.armor>0){const take=Math.min(state.armor,amount);state.armor-=take;amount-=take;}state.health=clamp(state.health-amount,0,100);this.hurtShake=Math.max(this.hurtShake,.22);if(!this.inCar){this.group.userData.playAction('hurt',.4);flashCharacter(this.group,0xff5e68);}dom.damage.style.opacity=.85;setTimeout(()=>dom.damage.style.opacity=0,110);updateHud();if(state.health<=0)this.respawn();else if(raw>0)audio.beep(72,.055,'sawtooth',.045);
   }
   respawn(){
     this.exitVehicle(true);state.health=100;state.armor=Math.max(0,state.armor-25);state.money=Math.max(0,state.money-150);state.heat=0;
@@ -763,13 +886,18 @@ const npcNames=['Avery','Milo','Nia','Rosa','Dante','June','Omar','Cass','Lena',
 const ambientLines=['The Strip never sleeps.','Storm coming off the bay.','I heard Crown Tower changed owners again.','Don’t trust a casino with no clocks.','Red Mesa is beautiful after dark.','The marina lights are unreal tonight.'];
 class NPC {
   constructor(pos,opts={}){
-    this.mesh=createCharacterMesh(opts);this.mesh.position.copy(pos);this.mesh.userData.npcRef=this;this.mesh.traverse(o=>o.userData.npcRef=this);this.name=opts.name||pick(npcNames);this.tag=opts.tag||null;this.role=opts.role||'civilian';this.health=100;this.down=false;this.timer=0;this.dir=rand(0,Math.PI*2);this.speed=rand(.55,1.4);this.hostile=!!opts.hostile;this.special=!!opts.special;this.talk=opts.talk||pick(ambientLines);this.counted=false;
+    this.mesh=createCharacterMesh(opts);this.mesh.position.copy(pos);this.mesh.userData.npcRef=this;this.mesh.traverse(o=>o.userData.npcRef=this);this.name=opts.name||pick(npcNames);this.tag=opts.tag||null;this.role=opts.role||'civilian';this.health=100;this.down=false;this.timer=0;this.dir=rand(0,Math.PI*2);this.speed=rand(.55,1.4);this.hostile=!!opts.hostile;this.special=!!opts.special;this.talk=opts.talk||pick(ambientLines);this.counted=false;this.attackCooldown=0;this.strikeTimer=0;this.fallProgress=0;
   }
   update(dt){
-    if(this.down){this.timer-=dt;if(this.timer<=0&&!this.hostile){this.down=false;this.health=75;this.mesh.rotation.z=0;this.mesh.position.y=1;}return;}
+    this.attackCooldown=Math.max(0,this.attackCooldown-dt);
+    if(this.strikeTimer>0){this.strikeTimer-=dt;if(this.strikeTimer<=0&&!this.down&&dist2D(this.mesh.position,player.position)<3.1)player.damage(this.role==='police'?6:5);}
+    if(this.down){
+      this.fallProgress=clamp(this.fallProgress+dt*4.2,0,1);const eased=smooth(this.fallProgress);this.mesh.rotation.z=eased*Math.PI/2;this.mesh.position.y=1-eased*.45;this.timer-=dt;
+      if(this.timer<=0&&!this.hostile){this.down=false;this.health=75;this.fallProgress=0;this.mesh.rotation.z=0;this.mesh.position.y=1;this.mesh.userData.playAction('getup',.55);}return;
+    }
     if(state.inInterior&&!this.special)return;
     if(this.hostile&&state.currentMission){
-      const target=player.position, d=dist2D(this.mesh.position,target);if(d<28){this.dir=Math.atan2(target.x-this.mesh.position.x,target.z-this.mesh.position.z);this.speed=2.8;if(d<15&&Math.random()<dt*.5)player.damage(5);}
+      const target=player.position,d=dist2D(this.mesh.position,target);if(d<28){this.dir=Math.atan2(target.x-this.mesh.position.x,target.z-this.mesh.position.z);this.speed=this.attackCooldown>.65?0:2.8;if(d<2.65&&this.attackCooldown<=0){this.attackCooldown=1.05;this.strikeTimer=.17;this.speed=0;this.mesh.userData.playAction('attack',.44);audio.beep(88,.045,'square',.035);}}
     }else if(!this.special){this.dir+=rand(-.6,.6)*dt;if(Math.random()<dt*.05)this.dir+=rand(-1.7,1.7);}
     const old=this.mesh.position.clone();this.mesh.position.x+=Math.sin(this.dir)*this.speed*dt;this.mesh.position.z+=Math.cos(this.dir)*this.speed*dt;
     if(!state.inInterior&&world.collides(this.mesh.position.x,this.mesh.position.z,.4)){this.mesh.position.copy(old);this.dir+=Math.PI*rand(.65,1.35);}
@@ -777,7 +905,10 @@ class NPC {
     this.mesh.rotation.y=this.dir;this.mesh.userData.animate(this.speed,state.gameTime);
   }
   hit(amount,type){
-    if(this.down)return;this.health-=amount;if(this.health<=0){this.down=true;this.timer=this.hostile?999:10;this.mesh.rotation.z=Math.PI/2;this.mesh.position.y=.55;if(this.hostile&&!this.counted){this.counted=true;missions.event('enemyDown',{npc:this});}}else{this.dir+=Math.PI;this.speed=4;}
+    if(this.down)return;this.health-=amount;this.mesh.userData.playAction('hurt',type==='vehicle'?.55:.4);flashCharacter(this.mesh,type==='punch'?0xffb05e:0xff5e68);
+    const away=this.mesh.position.clone().sub(player.position);away.y=0;if(away.lengthSq()>.001){away.normalize();const push=type==='vehicle'?1.35:type==='punch'?.72:.28;this.mesh.position.addScaledVector(away,push);this.dir=Math.atan2(away.x,away.z);}
+    if(this.health<=0){this.down=true;this.timer=this.hostile?999:10;this.fallProgress=0;if(this.hostile&&!this.counted){this.counted=true;missions.event('enemyDown',{npc:this});}}
+    else{this.dir+=Math.PI;this.speed=type==='punch'?4.8:3.7;}
   }
 }
 class PedestrianSystem {
@@ -1168,8 +1299,28 @@ function reloadWeapon(){
   const w=currentWeapon(),inv=state.inventory[w.id];if(w.slot===0||!inv||player.reloading||inv.mag>=w.clipSize||inv.reserve<=0)return;player.reloading=true;showToast('Reloading '+w.name,1);audio.beep(180,.12,'square',.05);setTimeout(()=>{const need=w.clipSize-inv.mag,take=Math.min(need,inv.reserve);inv.mag+=take;inv.reserve-=take;player.reloading=false;audio.beep(340,.06,'triangle',.05);updateHud();},650);
 }
 
-let mapZoom=1,mapCentre={x:0,z:0};
-function openFullMap(fromPause=false){if(!state.running)return;state.mapOpen=true;state.mapFromPause=fromPause;state.paused=true;dom.pause.classList.add('hidden');dom.fullMap.classList.remove('hidden');document.exitPointerLock();mapCentre={x:player.position.x,z:player.position.z};drawWorldMap();}
+let mapZoom=1,mapCentre={x:0,z:0},mapPOIFilter='all';
+function getMapPOIs(){
+  const places=[];
+  for(const sp of world.special)places.push({id:'landmark_'+sp.id,name:sp.name,category:'landmark',type:'Landmark',x:sp.x,z:sp.z,color:sp.id==='secondchance'?'#6affb0':'#ffd56a'});
+  for(const v of commerce.venues)places.push({id:'venue_'+v.id,name:v.name,category:v.type==='gunstore'?'store':'property',type:v.type==='gunstore'?'Weapon shop':commerce.isOwned(v.id)?'Owned home':'Property',x:v.pos.x,z:v.pos.z,color:v.type==='gunstore'?'#ff5e68':'#6affb0'});
+  if(!state.inInterior){
+    if(objectiveMarker.visible){const m=STORY.find(x=>x.title===state.currentMission);places.push({id:'story_objective',name:m?.title||'Current objective',category:'story',type:'Current objective',x:objectiveMarker.position.x,z:objectiveMarker.position.z,color:'#54e8ff'});}
+    else if(startMarker.visible){const m=STORY[state.missionIndex];places.push({id:'story_start',name:m?.title||'Next story mission',category:'story',type:'Story start',x:startMarker.position.x,z:startMarker.position.z,color:'#54e8ff'});}
+  }
+  return places;
+}
+function renderPOIList(){
+  if(!dom.poiList)return;const query=(dom.poiSearch?.value||'').trim().toLowerCase();const pp=player?.position||{x:0,z:0};
+  const places=getMapPOIs().filter(p=>(mapPOIFilter==='all'||p.category===mapPOIFilter)&&(!query||`${p.name} ${p.type} ${world.districtAt(p.x,p.z)}`.toLowerCase().includes(query))).sort((a,b)=>dist2D(pp,a)-dist2D(pp,b));
+  dom.poiList.innerHTML='';
+  if(!places.length){const empty=document.createElement('div');empty.className='poiHint';empty.textContent='No matching places found.';dom.poiList.appendChild(empty);return;}
+  for(const poi of places){const b=document.createElement('button');b.className='poiItem';b.type='button';const metres=Math.round(dist2D(pp,poi));b.innerHTML=`<strong>${poi.name}</strong><div class="poiMeta"><span>${world.districtAt(poi.x,poi.z)}</span><span>${metres} m</span></div><span class="poiBadge" style="color:${poi.color}">${poi.type} • Pin route</span>`;b.addEventListener('click',()=>focusMapPOI(poi));dom.poiList.appendChild(b);}
+}
+function focusMapPOI(poi){
+  mapCentre={x:poi.x,z:poi.z};mapZoom=Math.max(mapZoom,1.15);state.waypoint={x:poi.x,z:poi.z,name:poi.name};drawWorldMap();showToast(`GPS pinned: ${poi.name}`);saveGame(false);
+}
+function openFullMap(fromPause=false){if(!state.running)return;state.mapOpen=true;state.mapFromPause=fromPause;state.paused=true;dom.pause.classList.add('hidden');dom.fullMap.classList.remove('hidden');document.exitPointerLock();mapCentre={x:player.position.x,z:player.position.z};renderPOIList();drawWorldMap();}
 function closeFullMap(){dom.fullMap.classList.add('hidden');state.mapOpen=false;if(state.mapFromPause){state.mapFromPause=false;state.paused=true;dom.pause.classList.remove('hidden');}else{state.paused=false;renderer.domElement.requestPointerLock();}}
 function drawWorldMap(){
   const c=dom.worldMap,ctx=c.getContext('2d'),rect=c.getBoundingClientRect();const dpr=Math.min(devicePixelRatio,2);const cw=Math.max(600,Math.floor(rect.width*dpr)),ch=Math.max(380,Math.floor(rect.height*dpr));if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch;}const w=c.width,h=c.height,scale=.38*mapZoom*dpr;
@@ -1178,10 +1329,10 @@ function drawWorldMap(){
   ctx.strokeStyle='rgba(120,140,170,.35)';ctx.lineWidth=14*dpr;const minX=Math.floor((mapCentre.x-extentX)/48)*48,maxX=Math.ceil((mapCentre.x+extentX)/48)*48,minZ=Math.floor((mapCentre.z-extentZ)/48)*48,maxZ=Math.ceil((mapCentre.z+extentZ)/48)*48;for(let x=minX;x<=maxX;x+=48){ctx.beginPath();ctx.moveTo(x*scale,minZ*scale);ctx.lineTo(x*scale,maxZ*scale);ctx.stroke();}for(let z=minZ;z<=maxZ;z+=48){ctx.beginPath();ctx.moveTo(minX*scale,z*scale);ctx.lineTo(maxX*scale,z*scale);ctx.stroke();}
   ctx.lineWidth=2*dpr;ctx.strokeStyle='rgba(84,232,255,.12)';ctx.beginPath();ctx.arc(0,0,310*scale,0,Math.PI*2);ctx.stroke();
   const dot=(x,z,color,r=7,label='')=>{ctx.fillStyle=color;ctx.beginPath();ctx.arc(x*scale,z*scale,r*dpr,0,Math.PI*2);ctx.fill();if(label&&mapZoom>.75){ctx.fillStyle='#eaf0ff';ctx.font=`${11*dpr}px Segoe UI`;ctx.fillText(label,x*scale+9*dpr,z*scale-8*dpr);}};
-  for(const sp of world.special)dot(sp.x,sp.z,'#54e8ff',6,sp.name);
+  for(const sp of world.special)dot(sp.x,sp.z,sp.id==='secondchance'?'#6affb0':'#ffd56a',sp.id==='secondchance'?9:6,sp.name);
   for(const v of commerce.venues)dot(v.pos.x,v.pos.z,v.type==='gunstore'?'#ff5e68':'#6affb0',v.type==='property'&&commerce.isOwned(v.id)?9:6,v.name);
   const mission=objectiveMarker.visible?objectiveMarker:startMarker.visible?startMarker:null;if(mission)dot(mission.position.x,mission.position.z,mission===startMarker?'#ffd56a':'#54e8ff',10,'MISSION');
-  if(state.waypoint){ctx.strokeStyle='#b56cff';ctx.lineWidth=3*dpr;ctx.setLineDash([9*dpr,7*dpr]);ctx.beginPath();ctx.moveTo(player.position.x*scale,player.position.z*scale);ctx.lineTo(state.waypoint.x*scale,state.waypoint.z*scale);ctx.stroke();ctx.setLineDash([]);dot(state.waypoint.x,state.waypoint.z,'#b56cff',10,'GPS');}
+  if(state.waypoint){ctx.strokeStyle='#b56cff';ctx.lineWidth=3*dpr;ctx.setLineDash([9*dpr,7*dpr]);ctx.beginPath();ctx.moveTo(player.position.x*scale,player.position.z*scale);ctx.lineTo(state.waypoint.x*scale,state.waypoint.z*scale);ctx.stroke();ctx.setLineDash([]);dot(state.waypoint.x,state.waypoint.z,'#b56cff',10,state.waypoint.name||'GPS');}
   dot(player.position.x,player.position.z,'#ffffff',9,'YOU');ctx.restore();
   ctx.fillStyle='rgba(255,255,255,.68)';ctx.font=`${12*dpr}px Segoe UI`;ctx.fillText(`ZOOM ${mapZoom.toFixed(1)}×  •  ${world.districtAt(player.position.x,player.position.z)}`,16*dpr,24*dpr);
 }
@@ -1199,25 +1350,38 @@ function updateLighting(dt){
 // ---------------- Save/load ----------------
 function saveGame(notify=true){
   const p=player?.position||new THREE.Vector3(0,1,18);const data={version:state.saveVersion,time:state.time,health:state.health,armor:state.armor,money:state.money,heat:0,weapon:state.weapon,ammo:state.inventory.pulse?.reserve||0,inventory:state.inventory,ownedProperties:state.ownedProperties,lootedBuildings:state.lootedBuildings,waypoint:state.waypoint,missionIndex:state.missionIndex,currentMission:state.currentMission,missionStage:state.missionStage,missionData:state.missionData,choice:state.choice,pos:{x:p.x,y:1,z:p.z}};
-  localStorage.setItem('nd_save',JSON.stringify(data));if(notify)showToast('Game saved');
+  storage.set('nd_save',JSON.stringify(data));if(notify)showToast('Game saved');
 }
 function loadGame(){
-  const d=JSON.parse(localStorage.getItem('nd_save')||'null');if(!d)return false;const inv=freshInventory();if(d.inventory){for(const k of Object.keys(inv))Object.assign(inv[k],d.inventory[k]||{});}else if(d.ammo!=null){inv.pulse.reserve=d.ammo;}
+  const d=JSON.parse(storage.get('nd_save','null')||'null');if(!d)return false;const inv=freshInventory();if(d.inventory){for(const k of Object.keys(inv))Object.assign(inv[k],d.inventory[k]||{});}else if(d.ammo!=null){inv.pulse.reserve=d.ammo;}
   Object.assign(state,{time:d.time??20.25,health:d.health??100,armor:d.armor??0,money:d.money??500,heat:0,weapon:d.weapon??0,ammo:d.ammo??48,inventory:inv,ownedProperties:d.ownedProperties||[],lootedBuildings:d.lootedBuildings||[],waypoint:d.waypoint||null,missionIndex:d.missionIndex??0,currentMission:d.currentMission||null,missionStage:d.missionStage??0,missionData:d.missionData||{},choice:d.choice||null,inInterior:null});
   player.group.position.set(d.pos?.x||0,1,d.pos?.z||18);switchWeapon(state.inventory[WEAPONS[state.weapon]?.id]?.owned?state.weapon:0);if(state.currentMission){missions.beginStage();}else missions.refreshMarkers();updateHud();return true;
 }
-function newGame(){localStorage.removeItem('nd_save');Object.assign(state,{time:20.25,health:100,armor:0,money:500,heat:0,weapon:0,ammo:48,inventory:freshInventory(),ownedProperties:[],lootedBuildings:[],waypoint:null,missionIndex:0,currentMission:null,missionStage:0,missionData:{},choice:null,inInterior:null});player.exitVehicle(true);player.group.position.set(0,1,18);switchWeapon(0);missions.refreshMarkers();updateHud();}
+function newGame(){storage.remove('nd_save');Object.assign(state,{time:20.25,health:100,armor:0,money:500,heat:0,weapon:0,ammo:48,inventory:freshInventory(),ownedProperties:[],lootedBuildings:[],waypoint:null,missionIndex:0,currentMission:null,missionStage:0,missionData:{},choice:null,inInterior:null});player.exitVehicle(true);player.group.position.set(0,1,18);switchWeapon(0);missions.refreshMarkers();updateHud();}
+function loadSettingsUI(){
+  settingEls.preset.value=settings.preset||'medium';
+  settingEls.renderScale.value=settings.renderScale;
+  settingEls.drawDistance.value=settings.drawDistance;
+  settingEls.pedestrians.value=settings.pedestrians;
+  settingEls.traffic.value=settings.traffic;
+  settingEls.shadows.checked=!!settings.shadows;
+  settingEls.weatherFx.checked=!!settings.weatherFx;
+  settingEls.infiniteDay.checked=!!settings.infiniteDay;
+  settingEls.timeSpeed.value=settings.timeSpeed;
+  settingEls.sensitivity.value=settings.sensitivity;
+  updateSettingLabels();
+}
 function updateSettingLabels(){$('renderScaleValue').textContent=settingEls.renderScale.value+'%';$('drawDistanceValue').textContent=settingEls.drawDistance.value;$('pedValue').textContent=settingEls.pedestrians.value;$('trafficValue').textContent=settingEls.traffic.value;$('timeSpeedValue').textContent=settingEls.timeSpeed.value+'×';$('sensitivityValue').textContent=Number(settingEls.sensitivity.value).toFixed(1);}
 function applyPreset(name){const presets={potato:{renderScale:55,drawDistance:1,pedestrians:6,traffic:5,shadows:false,weatherFx:false},low:{renderScale:70,drawDistance:1,pedestrians:14,traffic:10,shadows:false,weatherFx:true},medium:{renderScale:90,drawDistance:2,pedestrians:28,traffic:20,shadows:true,weatherFx:true},high:{renderScale:105,drawDistance:3,pedestrians:40,traffic:28,shadows:true,weatherFx:true},ultra:{renderScale:120,drawDistance:4,pedestrians:58,traffic:42,shadows:true,weatherFx:true}};Object.assign(settings,presets[name],{preset:name});loadSettingsUI();}
 function saveSettings(){
   settings={preset:settingEls.preset.value,renderScale:+settingEls.renderScale.value,drawDistance:+settingEls.drawDistance.value,pedestrians:+settingEls.pedestrians.value,traffic:+settingEls.traffic.value,shadows:settingEls.shadows.checked,weatherFx:settingEls.weatherFx.checked,infiniteDay:settingEls.infiniteDay.checked,timeSpeed:+settingEls.timeSpeed.value,sensitivity:+settingEls.sensitivity.value};
-  localStorage.setItem('nd_settings',JSON.stringify(settings));renderer.setPixelRatio(Math.min(devicePixelRatio,settings.renderScale/100*1.5));renderer.shadowMap.enabled=settings.shadows;sun.castShadow=settings.shadows;pedestrians.syncCount();traffic.syncCount();world.update(player.position);showToast('Settings applied');
+  storage.set('nd_settings',JSON.stringify(settings));if(!renderer){updateSettingLabels();return;}renderer.setPixelRatio(Math.min(devicePixelRatio,settings.renderScale/100*1.5));renderer.shadowMap.enabled=settings.shadows;sun.castShadow=settings.shadows;pedestrians.syncCount();traffic.syncCount();world.update(player.position);showToast('Settings applied');
 }
 function openSettings(){loadSettingsUI();dom.settings.classList.remove('hidden');document.exitPointerLock();}
 function closeSettings(){saveSettings();dom.settings.classList.add('hidden');if(state.running&&!state.paused)renderer.domElement.requestPointerLock();}
 
 // ---------------- Game state ----------------
-function startGame(load=false){audio.init();dom.start.classList.add('hidden');dom.hud.classList.remove('hidden');state.title=false;state.running=true;state.paused=false;if(load){if(!loadGame())newGame();}else newGame();renderer.domElement.requestPointerLock();if(!localStorage.getItem('nd_helped'))dom.help.classList.remove('hidden');}
+function startGame(load=false){audio.init();dom.start.classList.add('hidden');dom.hud.classList.remove('hidden');state.title=false;state.running=true;state.paused=false;if(load){if(!loadGame())newGame();}else newGame();renderer.domElement.requestPointerLock();if(!storage.get('nd_helped'))dom.help.classList.remove('hidden');}
 function pauseGame(on=true){if(!state.running||state.mapOpen||state.commerceOpen)return;state.paused=on;dom.pause.classList.toggle('hidden',!on);if(on)document.exitPointerLock();else renderer.domElement.requestPointerLock();}
 function quitToTitle(){saveGame();state.running=false;state.paused=false;state.title=true;dom.pause.classList.add('hidden');dom.hud.classList.add('hidden');dom.start.classList.remove('hidden');document.exitPointerLock();}
 
@@ -1254,18 +1418,42 @@ function animate(){
 }
 
 // ---------------- Boot ----------------
+function showStartupError(error){
+  console.error('Neon Dominion startup error:',error);
+  if(dom.engineStatus){dom.engineStatus.textContent='Startup error — '+(error?.message||'unknown error');dom.engineStatus.classList.add('error');}
+  const card=document.querySelector('.titleCard');
+  if(card){
+    const details=document.createElement('div');
+    details.className='subtitle';
+    details.style.marginTop='14px';
+    details.textContent='The game could not start. Refresh once, then open this file in Chrome or Edge. Error: '+(error?.message||'Unknown startup error');
+    card.appendChild(details);
+  }
+}
 function boot(){
-  initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();player=new Player();traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateObjectiveMarker();
-  setTimeout(()=>{dom.loading.classList.add('hidden');dom.start.classList.remove('hidden');},500);animate();
+  try{
+    initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();player=new Player();traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateObjectiveMarker();
+    dom.start.classList.remove('hidden');
+    dom.engineStatus.textContent='3D engine ready';
+    $('newGameBtn').disabled=false;$('continueBtn').disabled=false;$('startSettingsBtn').disabled=false;
+    animate();
+  }catch(error){showStartupError(error);}
 }
 
 // Buttons
-$('newGameBtn').onclick=()=>startGame(false);$('continueBtn').onclick=()=>startGame(true);$('startSettingsBtn').onclick=openSettings;$('pauseSettingsBtn').onclick=openSettings;$('openMapBtn').onclick=()=>openFullMap(true);$('resumeBtn').onclick=()=>pauseGame(false);$('saveBtn').onclick=saveGame;$('quitBtn').onclick=quitToTitle;$('closeSettingsBtn').onclick=closeSettings;$('resetSettingsBtn').onclick=()=>{settings={...DEFAULT_SETTINGS};loadSettingsUI();};$('closeHelp').onclick=()=>{dom.help.classList.add('hidden');localStorage.setItem('nd_helped','1');renderer.domElement.requestPointerLock();};
+$('newGameBtn').onclick=()=>startGame(false);$('continueBtn').onclick=()=>startGame(true);$('startSettingsBtn').onclick=openSettings;$('pauseSettingsBtn').onclick=openSettings;$('openMapBtn').onclick=()=>openFullMap(true);$('resumeBtn').onclick=()=>pauseGame(false);$('saveBtn').onclick=saveGame;$('quitBtn').onclick=quitToTitle;$('closeSettingsBtn').onclick=closeSettings;$('resetSettingsBtn').onclick=()=>{settings={...DEFAULT_SETTINGS};loadSettingsUI();};$('closeHelp').onclick=()=>{dom.help.classList.add('hidden');storage.set('nd_helped','1');renderer.domElement.requestPointerLock();};
 $('closeMapBtn').onclick=closeFullMap;$('mapZoomIn').onclick=()=>{mapZoom=clamp(mapZoom*1.25,.45,3.2);drawWorldMap();};$('mapZoomOut').onclick=()=>{mapZoom=clamp(mapZoom/1.25,.45,3.2);drawWorldMap();};$('mapCenter').onclick=()=>{mapCentre={x:player.position.x,z:player.position.z};drawWorldMap();};$('closeCommerceBtn').onclick=closeCommerce;
+dom.poiSearch?.addEventListener('input',renderPOIList);for(const tab of dom.poiTabs){tab.addEventListener('click',()=>{mapPOIFilter=tab.dataset.poiFilter;dom.poiTabs.forEach(t=>t.classList.toggle('active',t===tab));renderPOIList();});}
 dom.worldMap.addEventListener('click',e=>{state.waypoint=mapCoordinateFromEvent(e);showToast('GPS waypoint placed');drawWorldMap();saveGame(false);});dom.worldMap.addEventListener('contextmenu',e=>{e.preventDefault();state.waypoint=null;drawWorldMap();saveGame(false);});
 settingEls.preset.onchange=()=>applyPreset(settingEls.preset.value);Object.values(settingEls).forEach(el=>el.addEventListener('input',updateSettingLabels));
 
-if(window.THREE){boot();}else{dom.loading.innerHTML='<div style="max-width:650px;padding:30px;text-align:center"><h2>Three.js could not load</h2><p>Connect to the internet, refresh the page, or upload this file to GitHub Pages. The game itself is contained in this HTML, while its 3D engine loads from a trusted CDN.</p></div>';}
+window.addEventListener('error',event=>{
+  if(!state.running&&event.error)showStartupError(event.error);
+});
+window.__threeReady.then(()=>boot()).catch(error=>{
+  if(dom.engineStatus){dom.engineStatus.textContent='3D engine connection failed';dom.engineStatus.classList.add('error');}
+  showStartupError(error);
+});
 })();
 </script>
 </body>
