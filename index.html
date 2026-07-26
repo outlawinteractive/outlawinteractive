@@ -215,6 +215,36 @@ body.phone-mode canvas{touch-action:none}
 #shopDescription{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
 .titleCard:after{content:'BETA 1.2 • WORLD REBUILD'}
 
+
+/* ==========================================================
+   BETA 1.3 — PHONE, POLICE, WAYPOINTS & INTERIORS
+   ========================================================== */
+#policeBadge{position:fixed;right:18px;top:92px;z-index:33;padding:10px 12px;border-radius:14px;min-width:210px;pointer-events:none}
+#policeBadge strong{display:block;color:#ff7b83;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+#policeBadge span{display:block;margin-top:4px;color:#f1f5ff;font-size:11px}
+#phoneScreen{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:rgba(3,6,13,.66)}
+#phoneScreen.hidden{display:none!important}
+#phoneShell{width:min(390px,92vw);border-radius:32px;padding:14px;background:linear-gradient(180deg,rgba(16,20,34,.96),rgba(7,10,20,.98));border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
+#phoneTop{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 10px 6px}
+#phoneTop strong{font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+#phoneTime{font-size:11px;color:#aeb8cc}
+#phoneBody{display:grid;gap:10px}
+.phoneCard{padding:12px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
+.phoneLabel{font-size:10px;color:#9fb1d0;letter-spacing:.14em;text-transform:uppercase;font-weight:900;margin-bottom:4px}
+.phoneValue{font-size:14px;line-height:1.45;color:#f7fbff}
+.phoneSub{margin-top:4px;font-size:11px;color:#c4cde0;line-height:1.45}
+#phoneActions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+#phoneActions button,#phoneClose{min-height:42px;border-radius:14px}
+#phoneFeed{display:grid;gap:7px;max-height:150px;overflow:auto;padding-right:2px}
+.phoneMsg{padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05)}
+.phoneMsg strong{display:block;font-size:11px;color:#4ee8ff;margin-bottom:3px}
+.phoneMsg span{display:block;font-size:11px;color:#edf4ff;line-height:1.45}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 11px}
+.swatches i{display:block;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.26);box-shadow:0 0 0 1px rgba(0,0,0,.16) inset}
+.shopItem.equipped{border-color:rgba(96,245,167,.35);background:linear-gradient(180deg,rgba(96,245,167,.08),rgba(255,255,255,.03))}
+.shopItem.equipped h3{color:#dfffe9}
+@media(max-width:520px){#phoneShell{padding:12px;border-radius:26px}}
+
 </style>
 </head>
 <body>
@@ -281,6 +311,41 @@ body.phone-mode canvas{touch-action:none}
 </div>
 <div id="missionCarCallout" class="glass hidden"><strong>MISSION VEHICLE</strong><span>Follow the green C marker and purple route.</span></div>
 
+
+<div id="policeBadge" class="glass hidden"><strong>POLICE SCAN</strong><span id="policeBadgeText">No active units nearby.</span></div>
+<div id="phoneScreen" class="hidden" aria-label="Phone UI">
+  <div id="phoneShell" class="glass">
+    <div id="phoneTop">
+      <div>
+        <strong>Dominion Phone</strong>
+        <div id="phoneTime">00:00 • Crown City</div>
+      </div>
+      <button id="phoneClose" class="secondary" type="button">Close</button>
+    </div>
+    <div id="phoneBody">
+      <div class="phoneCard">
+        <div class="phoneLabel">Mission</div>
+        <div class="phoneValue" id="phoneMission">Free roam</div>
+        <div class="phoneSub" id="phoneObjective">Explore Crown City and use the map to pin a route.</div>
+      </div>
+      <div class="phoneCard">
+        <div class="phoneLabel">GPS</div>
+        <div class="phoneValue" id="phoneWaypoint">No waypoint pinned</div>
+        <div class="phoneSub" id="phoneWaypointSub">Pin a route from the city map or use the buttons below.</div>
+      </div>
+      <div id="phoneActions">
+        <button id="phoneOpenMap" class="primary" type="button">Open Map</button>
+        <button id="phoneSave" class="secondary" type="button">Save Game</button>
+        <button id="phonePinMission" class="secondary" type="button">Pin Mission</button>
+        <button id="phoneClearWaypoint" class="secondary" type="button">Clear GPS</button>
+      </div>
+      <div class="phoneCard">
+        <div class="phoneLabel">Messages</div>
+        <div id="phoneFeed"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 window.ND_BETA_DATA = {
 facades: [
@@ -13639,7 +13704,7 @@ function hRand(x,z,n=0,a=0,b=1){return a+(b-a)*hash2(x+n*73,z-n*97,9127+n*31);}
 const DEFAULT_SETTINGS={preset:'medium',renderScale:90,drawDistance:2,pedestrians:36,traffic:20,shadows:true,weatherFx:true,infiniteDay:false,timeSpeed:1,sensitivity:1,phoneMode:'auto'};
 let settings={...DEFAULT_SETTINGS};
 try{settings={...settings,...JSON.parse(storage.get('nd_reborn_settings','{}')||'{}')};}catch(e){}
-const state={running:false,paused:false,title:true,mapOpen:false,mapFromPause:false,shopOpen:false,dialogue:false,time:18.5,health:100,stamina:100,respect:0,money:500,wanted:0,wantedTimer:0,missionIndex:0,currentMission:null,missionStage:0,missionData:{},ownedProperties:[],ownedVehicles:[0],outfit:0,shoeStyle:0,waypoint:null,inInterior:null,weather:'clear',weatherTimer:70,lastSafe:{x:0,y:1,z:24},saveVersion:11,shoeStyle:0};
+const state={running:false,paused:false,title:true,mapOpen:false,mapFromPause:false,shopOpen:false,dialogue:false,time:18.5,health:100,stamina:100,respect:0,money:500,wanted:0,wantedTimer:0,missionIndex:0,currentMission:null,missionStage:0,missionData:{},ownedProperties:[],ownedVehicles:[0],outfit:0,shoeStyle:0,waypoint:null,inInterior:null,weather:'clear',weatherTimer:70,lastSafe:{x:0,y:1,z:24},saveVersion:12,shoeStyle:0};
 
 const dom={
  title:$('titleScreen'),hud:$('hud'),pause:$('pauseScreen'),settings:$('settingsScreen'),mapScreen:$('mapScreen'),shop:$('shopScreen'),
@@ -14251,7 +14316,130 @@ const ndOldAnimate=animate;
 animate=function(){if(world?.materials?.water?.map){world.materials.water.map.offset.x=(performance.now()*.000018)%1;world.materials.water.map.offset.y=(performance.now()*.000009)%1;}return ndOldAnimate();};
 
 
-function boot(){try{initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();worldEnhancements=new WorldEnhancementSystem();player=new Player();applyShoeStyle(player.group,state.shoeStyle||0);traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateMarkers();installPhoneControls();applyPhoneMode();dom.engine.textContent='3D engine ready • Living World Beta 1.2';$('newGame').disabled=false;$('continueGame').disabled=false;$('titleSettings').disabled=false;animate();}catch(e){console.error(e);dom.engine.textContent='Startup error — '+(e.message||'unknown error');dom.engine.classList.add('error');}}
+
+// ============================================================
+// BETA 1.3 — POLICE VISIBILITY, PHONE, WAYPOINTS & UPSTAIRS
+// ============================================================
+const policeDom={badge:$('policeBadge'),text:$('policeBadgeText')};
+const phoneDom={screen:$('phoneScreen'),close:$('phoneClose'),time:$('phoneTime'),mission:$('phoneMission'),objective:$('phoneObjective'),waypoint:$('phoneWaypoint'),waypointSub:$('phoneWaypointSub'),feed:$('phoneFeed'),openMap:$('phoneOpenMap'),save:$('phoneSave'),pinMission:$('phonePinMission'),clearWaypoint:$('phoneClearWaypoint')};
+state.phoneOpen=false;
+const phoneMessages=[];
+function addPhoneMessage(from,text){if(!text)return;phoneMessages.unshift({from,text});if(phoneMessages.length>8)phoneMessages.length=8;refreshPhoneUI();}
+function nearestPoliceDistance(){if(!police?.units?.length)return Infinity;let d=Infinity;for(const u of police.units)d=Math.min(d,dist(u.mesh.position,player.position));return d;}
+function refreshPhoneUI(){
+  if(!phoneDom.screen)return;
+  const hours=Math.floor(state.time)%24,mins=Math.floor((state.time-hours)*60);
+  phoneDom.time.textContent=`${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')} • ${world?world.districtAt(player.position.x,player.position.z):'Crown City'}`;
+  const missionName=state.currentMission||DATA.missions[state.missionIndex]?.title||'Free roam';
+  const stage=missions?.stage?.();
+  phoneDom.mission.textContent=state.currentMission?missionName:'Free roam • '+missionName;
+  phoneDom.objective.textContent=stage?.objective||(!state.currentMission?`Meet ${DATA.missions[state.missionIndex]?.giver||'your contact'} to begin “${missionName}”.`:'Explore Crown City.');
+  if(state.waypoint){phoneDom.waypoint.textContent=state.waypoint.name||'Custom waypoint';const d=Math.round(dist(player.position,state.waypoint));phoneDom.waypointSub.textContent=`${d>999?(d/1000).toFixed(1)+' km':d+' m'} away • GPS active`;}
+  else if(state.currentMission&&currentStageTarget()){const t=currentStageTarget(),d=Math.round(dist(player.position,t));phoneDom.waypoint.textContent='Mission route active';phoneDom.waypointSub.textContent=`${d>999?(d/1000).toFixed(1)+' km':d+' m'} to next objective`;}
+  else {phoneDom.waypoint.textContent='No waypoint pinned';phoneDom.waypointSub.textContent='Pin a route from the city map or use “Pin Mission”.';}
+  phoneDom.feed.innerHTML='';
+  const items=phoneMessages.length?phoneMessages:[{from:'System',text:'Phone online. Press P any time to review your mission, GPS and messages.'}];
+  for(const msg of items){const row=document.createElement('div');row.className='phoneMsg';row.innerHTML=`<strong>${msg.from}</strong><span>${msg.text}</span>`;phoneDom.feed.appendChild(row);} 
+}
+function openPhone(){if(!state.running||state.mapOpen||state.shopOpen||state.dialogue)return;state.phoneOpen=true;state.paused=true;phoneDom.screen.classList.remove('hidden');document.exitPointerLock();refreshPhoneUI();}
+function closePhone(){if(!state.phoneOpen)return;state.phoneOpen=false;phoneDom.screen.classList.add('hidden');state.paused=false;if(state.running)safePointerLock();}
+phoneDom.close.onclick=closePhone;
+phoneDom.openMap.onclick=()=>{closePhone();openMap(false);};
+phoneDom.save.onclick=()=>{saveGame(true);refreshPhoneUI();};
+phoneDom.clearWaypoint.onclick=()=>{state.waypoint=null;showToast('GPS cleared');updateGPS();drawWorldMap();refreshPhoneUI();saveGame(false);};
+phoneDom.pinMission.onclick=()=>{const t=currentStageTarget()||(startMarker?.visible?{x:startMarker.position.x,z:startMarker.position.z,name:DATA.missions[state.missionIndex]?.title||'Mission start'}:null);if(!t){showToast('No mission route available');return;}state.waypoint={x:t.x,z:t.z,name:t.name||'Mission route'};showToast('Mission route pinned');updateGPS();drawWorldMap();refreshPhoneUI();saveGame(false);};
+window.addEventListener('keydown',e=>{if(e.code==='KeyP'){e.preventDefault();e.stopImmediatePropagation();state.phoneOpen?closePhone():openPhone();}else if(state.phoneOpen&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();closePhone();}},true);
+if($('mobileTopButtons')&&!$('mobilePhone')){const b=document.createElement('button');b.id='mobilePhone';b.className='mobileSmall';b.type='button';b.textContent='PHONE';b.onclick=()=>state.phoneOpen?closePhone():openPhone();$('mobileTopButtons').appendChild(b);}
+
+// GPS priority fixes: custom waypoint should show on the GPS and map immediately.
+activeTarget=function(){if(state.inInterior)return null;if(state.waypoint)return{...state.waypoint,source:'waypoint'};if(state.currentMission){const t=currentStageTarget();if(t){const m=DATA.missions[state.missionIndex];return{...t,name:missions.stage()?.type==='enterCar'?'Mission vehicle':(m?.title||'Mission objective'),source:'mission'};}}const marker=startMarker.visible?startMarker:null;if(marker){const m=DATA.missions[state.missionIndex];return{x:marker.position.x,z:marker.position.z,name:m?`${m.letter} — ${m.title}`:'Story mission',source:'mission'};}return null;};
+const ndBaseWorldMap=drawWorldMap;
+drawWorldMap=function(){ndBaseWorldMap();const c=dom.worldMap,ctx=c.getContext('2d'),dpr=Math.min(devicePixelRatio,2),scale=.37*mapZoom*dpr,ox=c.width/2-mapCentre.x*scale,oy=c.height/2-mapCentre.z*scale;
+ if(state.waypoint){ctx.save();const x=state.waypoint.x*scale+ox,y=state.waypoint.z*scale+oy;ctx.fillStyle='#a86cff';ctx.beginPath();ctx.moveTo(x,y-15*dpr);ctx.lineTo(x+10*dpr,y+4*dpr);ctx.lineTo(x-10*dpr,y+4*dpr);ctx.closePath();ctx.fill();ctx.beginPath();ctx.arc(x,y+10*dpr,7*dpr,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f3e9ff';ctx.font=`900 ${10*dpr}px Segoe UI`;ctx.fillText(state.waypoint.name||'Waypoint',x+10*dpr,y-10*dpr);ctx.restore();}
+ if(police?.units?.length){ctx.save();for(const u of police.units){const x=u.mesh.position.x*scale+ox,y=u.mesh.position.z*scale+oy;ctx.fillStyle='#ff626c';ctx.beginPath();ctx.arc(x,y,5*dpr,0,Math.PI*2);ctx.fill();}ctx.restore();}
+};
+dom.worldMap.addEventListener('click',()=>setTimeout(()=>{updateGPS();drawWorldMap();refreshPhoneUI();},0));
+dom.worldMap.addEventListener('contextmenu',()=>setTimeout(()=>{updateGPS();drawWorldMap();refreshPhoneUI();},0));
+
+// Better third-person in-car camera that follows the vehicle heading.
+Player.prototype.updateDriving=function(dt){
+ const lookX=mouse.dx,lookY=mouse.dy;this.pitch=clamp(this.pitch-lookY*.0011*settings.sensitivity,-.05,.52);const c=this.inCar,th=(keys.KeyW?1:0)-(keys.KeyS?1:0),st=(keys.KeyA?1:0)-(keys.KeyD?1:0),p=c.preset;
+ c.speed+=th*(c.speed*th<0?p.acceleration*1.8:p.acceleration)*dt;c.speed*=Math.pow(.986,dt*60);c.speed=clamp(c.speed,-12,p.maxSpeed);
+ if(Math.abs(c.speed)>.2)c.heading+=st*clamp(Math.abs(c.speed)/12,.24,1.7)*dt*(c.speed>=0?1:-1)*p.handling;
+ const impact=Math.abs(c.speed),ok=moveCarSwept(c,Math.sin(c.heading)*c.speed*dt,Math.cos(c.heading)*c.speed*dt,1.08);
+ if(!ok){c.speed*=-.15;if(impact>8)this.damage(Math.min(16,impact*.4));}
+ c.mesh.rotation.y=c.heading;c.mesh.position.y=terrainHeightAt(c.mesh.position.x,c.mesh.position.z);c.mesh.userData.wheels.forEach(w=>w.rotation.x-=c.speed*dt/.35);this.group.position.copy(c.mesh.position);this.group.visible=false;world.update(c.mesh.position);audio.setEngine(c.speed,true);traffic.hitPedestrians(c,impact);
+ this.yaw-=lookX*.0012*settings.sensitivity;this.yaw+=angleDelta(this.yaw,c.heading)*Math.min(1,dt*4.2);mouse.dx=0;mouse.dy=0;
+};
+Player.prototype.updateCamera=function(dt){const p=this.position,anchorYaw=this.inCar?this.yaw:this.yaw,carOffset=this.inCar?2.9:2.05,distance=this.inCar?8.8:6.5,desired=new THREE.Vector3(p.x-Math.sin(anchorYaw)*Math.cos(this.pitch)*distance,p.y+carOffset+Math.sin(this.pitch)*distance,p.z-Math.cos(anchorYaw)*Math.cos(this.pitch)*distance);if(this.hurt>0)desired.add(new THREE.Vector3(rand(-.08,.08),rand(-.05,.06),rand(-.08,.08)).multiplyScalar(this.hurt*5));camera.position.lerp(desired,1-Math.pow(.0007,dt));const lookYaw=this.inCar?this.inCar.heading:this.group.rotation.y;camera.lookAt(p.x+Math.sin(lookYaw)*(this.inCar?2.2:0),p.y+carOffset*.65,p.z+Math.cos(lookYaw)*(this.inCar?2.2:0));};
+
+// Upstairs interiors plus interior floor heights for movement.
+InteriorManager.prototype.build=function(type,id){
+ const x=5200+(this.counter%20)*90,z=5200+Math.floor(this.counter/20)*80;this.counter++;
+ const g=new THREE.Group();g.position.set(x,0,z);
+ const floorMat=new THREE.MeshStandardMaterial({map:type==='shop'?sidewalkTexture():type==='apartment'?grassTexture():roadTexture(),roughness:.82});
+ const wallMat=new THREE.MeshStandardMaterial({color:type==='apartment'?0xd6cec5:type==='shop'?0x2f3544:0xa8b1bf,roughness:.84});
+ const darkMat=new THREE.MeshStandardMaterial({color:type==='shop'?0x222b39:type==='apartment'?0x6e5a4d:0x4e5968,roughness:.62,metalness:.08});
+ const woodMat=new THREE.MeshStandardMaterial({color:0x79563e,roughness:.75});
+ const accentMat=new THREE.MeshStandardMaterial({color:type==='shop'?0xff5ac8:type==='apartment'?0x60f5a7:0x4ee8ff,roughness:.42,metalness:.15,emissive:type==='shop'?0xff5ac8:type==='apartment'?0x60f5a7:0x4ee8ff,emissiveIntensity:.08});
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(48,40),floorMat);floor.rotation.x=-Math.PI/2;g.add(floor);
+ const wallGeoH=new THREE.BoxGeometry(48,6,.5),wallGeoV=new THREE.BoxGeometry(.5,6,40);
+ for(const [wx,wy,wz,geo] of [[0,3,-20,wallGeoH],[0,3,20,wallGeoH],[-24,3,0,wallGeoV],[24,3,0,wallGeoV]]){const w=new THREE.Mesh(geo,wallMat);w.position.set(wx,wy,wz);g.add(w);}
+ const upper=new THREE.Mesh(new THREE.BoxGeometry(18,.45,17),darkMat);upper.position.set(-12,3.2,-6);g.add(upper);
+ const railMat=new THREE.MeshStandardMaterial({color:0xc8d3df,metalness:.55,roughness:.34});
+ for(const [sx,sz,sw] of [[-12,2.8,18],[-3,-6,17],[-21,-6,17]]){const rail=new THREE.Mesh(new THREE.BoxGeometry(sw,.18,.18),railMat);rail.position.set(sx,4.25,sz);rail.rotation.y=sx===-12?0:Math.PI/2;g.add(rail);} 
+ for(let i=0;i<8;i++){const step=new THREE.Mesh(new THREE.BoxGeometry(4,.4,2),woodMat);step.position.set(-19,0.2+i*.4,10-i*1.8);g.add(step);} 
+ const addBox=(sx,sy,sz,px,py,pz,mat=darkMat)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.position.set(px,py,pz);g.add(m);return m;};
+ if(type==='shop'){
+   addBox(16,1.1,2.5,8,.58,8,woodMat);addBox(4,3,.55,-18,2,4,accentMat);addBox(6,2.5,.4,-12,5.1,-13,accentMat);addBox(8,.7,2.2,-9,3.75,-2,woodMat);addBox(6,.7,2.2,-15,3.75,-11,woodMat);
+   for(const px of[-17,-10,-3,4,11,18]){addBox(3,.7,1.4,px,.9,-12,woodMat);addBox(2.2,2.5,.35,px,2.1,-18.8,darkMat);} 
+   for(let i=0;i<10;i++){const mannequin=createCharacterMesh({outfit:(i*11)%DATA.outfits.length});mannequin.scale.setScalar(.72);mannequin.position.set(i<6?-17+i*7: -17+(i-6)*5.8,0,i<6?-9: -3);mannequin.rotation.y=Math.PI*.9;g.add(mannequin);} 
+ }else if(type==='apartment'){
+   addBox(10,.8,5,-10,.4,-9,woodMat);addBox(9,1.1,4,-10,1.2,-9,darkMat);addBox(10,.7,1,-10,2,-11,accentMat);addBox(8,.6,4,10,.3,-8,woodMat);addBox(2.5,1.1,2.5,9,.55,4,woodMat);addBox(8,2.8,.5,10,1.5,12,darkMat);
+   addBox(7,.7,3,-13,3.6,-10,woodMat);addBox(6,1.2,2.6,-13,4.3,-10,darkMat);addBox(6,2.4,.45,-13,5.1,-16,accentMat);addBox(4,.4,4,-5,3.45,-1,woodMat);
+ }else if(type==='office'){
+   for(const px of[-15,-5,5,15])for(const pz of[-9,4]){addBox(6,.25,3,px,1,pz,woodMat);addBox(1.8,1.2,.25,px,1.8,pz-.5,accentMat);}addBox(8,.28,3,-12,4.05,-10,woodMat);addBox(8,.28,3,-12,4.05,-3,woodMat);addBox(1.9,1.2,.25,-12,4.85,-10.5,accentMat);addBox(1.9,1.2,.25,-12,4.85,-3.5,accentMat);
+ }else{
+   addBox(18,1.2,3,0,.6,-8,woodMat);addBox(10,3,.7,0,1.7,-18.5,accentMat);for(const px of[-14,14])addBox(7,.6,2.3,px,.3,5,darkMat);addBox(12,.5,3,-12,3.5,-10,woodMat);
+ }
+ for(const lx of[-14,0,14]){const lightPanel=new THREE.Mesh(new THREE.BoxGeometry(7,.06,.7),new THREE.MeshBasicMaterial({color:0xe8f7ff}));lightPanel.position.set(lx,5.92,0);g.add(lightPanel);} 
+ const exit=new THREE.Vector3(x,1,z+17),spawn=new THREE.Vector3(x,1,z+12.5);const exitSign=new THREE.Mesh(new THREE.PlaneGeometry(4.2,1.2),new THREE.MeshBasicMaterial({map:signTexture('EXIT','#60f5a7'),transparent:true}));exitSign.position.set(0,4.5,19.72);exitSign.rotation.y=Math.PI;g.add(exitSign);
+ g.traverse(o=>{if(o.isMesh){o.castShadow=settings.shadows;o.receiveShadow=true;}});this.root.add(g);
+ const room={id,type,group:g,exit,spawn,floorHeightAt(wx,wz){const lx=wx-x,lz=wz-z;if(lx<-5&&lz<2&&lz>-18)return 4.2;if(lx>-21&&lx<-17&&lz>=-2&&lz<=12)return clamp(1+((12-lz)/14)*3.2,1,4.2);return 1;}};
+ this.rooms.set(id,room);return room;
+};
+InteriorManager.prototype.doorNear=function(pos){return !!(this.current&&pos.distanceTo(this.current.exit)<5.2);};
+Player.prototype.updateWalking=function(dt){
+ this.yaw-=mouse.dx*.0022*settings.sensitivity;this.pitch=clamp(this.pitch-mouse.dy*.0017*settings.sensitivity,-.2,.84);mouse.dx=mouse.dy=0;
+ const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0),move=new THREE.Vector3();
+ if(f||s){const fw=new THREE.Vector3(Math.sin(this.yaw),0,Math.cos(this.yaw)),rt=new THREE.Vector3(fw.z,0,-fw.x);move.addScaledVector(fw,f).addScaledVector(rt,s).normalize();}
+ const sprint=(keys.ShiftLeft||keys.ShiftRight)&&state.stamina>1,target=move.length()?(sprint?8.8:4.9):0;state.stamina=clamp(state.stamina+(sprint&&move.length()?-22:13)*dt,0,100);
+ this.velocity.x=lerp(this.velocity.x,move.x*target,1-Math.pow(.001,dt));this.velocity.z=lerp(this.velocity.z,move.z*target,1-Math.pow(.001,dt));
+ if(state.inInterior){const r=interiors.current,cx=r.group.position.x,cz=r.group.position.z;this.group.position.x=clamp(this.group.position.x+this.velocity.x*dt,cx-22.5,cx+22.5);this.group.position.z=clamp(this.group.position.z+this.velocity.z*dt,cz-18.5,cz+18.5);this.group.position.y=r.floorHeightAt?r.floorHeightAt(this.group.position.x,this.group.position.z):1;this.velocity.y=0;this.onGround=true;}
+ else{if(keys.Space&&this.onGround){this.velocity.y=7.1;this.onGround=false;keys.Space=false;}this.velocity.y-=19*dt;const nx=this.group.position.x+this.velocity.x*dt,nz=this.group.position.z+this.velocity.z*dt;if(!world.collides(nx,this.group.position.z,.45))this.group.position.x=nx;else this.velocity.x=0;if(!world.collides(this.group.position.x,nz,.45))this.group.position.z=nz;else this.velocity.z=0;this.group.position.y+=this.velocity.y*dt;const groundY=terrainHeightAt(this.group.position.x,this.group.position.z)+1;if(this.group.position.y<=groundY){this.group.position.y=groundY;this.velocity.y=0;this.onGround=true;}}
+ const speed=Math.hypot(this.velocity.x,this.velocity.z);if(speed>.2){this.group.rotation.y=Math.atan2(this.velocity.x,this.velocity.z);state.lastSafe={x:this.group.position.x,y:this.group.position.y,z:this.group.position.z};}
+ this.group.userData.animate(speed,performance.now()/1000);if(!state.inInterior)world.update(this.group.position);
+};
+
+// Mission stage prompts and phone messages.
+MissionSystem.prototype.stageSummary=function(s){if(!s)return 'Mission complete.';if(s.objective)return s.objective;if(s.type==='go')return 'Travel to the marked location.';if(s.type==='drive')return 'Drive to the marked location.';if(s.type==='checkpoints')return 'Drive through every checkpoint.';if(s.type==='enterCar')return 'Get into the marked vehicle.';if(s.type==='talk')return 'Speak to the contact.';if(s.type==='wait')return 'Stay in the marked area.';if(s.type==='wanted')return 'Lose the police.';return 'Complete the objective.';};
+const ndMissionActivate=MissionSystem.prototype.activateStage;
+MissionSystem.prototype.activateStage=function(){const s=this.stage();ndMissionActivate.call(this);const stage=this.stage();if(stage){const summary=this.stageSummary(stage);showToast(summary);addPhoneMessage(this.mission()?.giver||'Mission',summary);}refreshPhoneUI();};
+const ndMissionComplete=MissionSystem.prototype.complete;
+MissionSystem.prototype.complete=function(){addPhoneMessage('Mission Control',`${this.mission()?.title||'Mission'} complete. Reward sent to your account.`);ndMissionComplete.call(this);refreshPhoneUI();};
+
+// Police visuals: flashing light bars plus on-screen scan panel.
+function ensurePoliceVisual(unit){if(unit.mesh.userData.ndPoliceReady)return;const bar=new THREE.Mesh(new THREE.BoxGeometry(1.15,.18,.34),new THREE.MeshStandardMaterial({color:0x1a1f2a,metalness:.55,roughness:.3}));bar.position.set(0,1.22,0);const red=new THREE.Mesh(new THREE.BoxGeometry(.42,.1,.24),new THREE.MeshBasicMaterial({color:0xff4d5c}));red.position.set(-.26,.13,0);const blue=new THREE.Mesh(new THREE.BoxGeometry(.42,.1,.24),new THREE.MeshBasicMaterial({color:0x4ee8ff}));blue.position.set(.26,.13,0);bar.add(red,blue);unit.mesh.add(bar);unit.mesh.userData.ndPoliceReady={bar,red,blue};}
+const ndPoliceUpdate=PoliceSystem.prototype.update;
+PoliceSystem.prototype.update=function(dt){ndPoliceUpdate.call(this,dt);let nearest=Infinity;for(const unit of this.units){ensurePoliceVisual(unit);const flash=0.5+0.5*Math.sin(performance.now()*.02);const vis=unit.mesh.userData.ndPoliceReady;vis.red.material.opacity=.35+.65*(flash>.5?1:.2);vis.blue.material.opacity=.35+.65*(flash<.5?1:.2);vis.red.material.transparent=vis.blue.material.transparent=true;nearest=Math.min(nearest,dist(unit.mesh.position,player.position));}
+ if(this.units.length&&state.wanted>0){policeDom.badge.classList.remove('hidden');policeDom.text.textContent=`${this.units.length} unit${this.units.length>1?'s':''} tracking you • nearest ${Math.round(nearest)} m`;}
+ else policeDom.badge.classList.add('hidden');
+};
+
+// Boot-time phone welcome.
+addPhoneMessage('System','Welcome to Neon Dominion Beta 1.3. Press P for your phone, mission log and GPS tools.');
+
+function boot(){try{initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();worldEnhancements=new WorldEnhancementSystem();player=new Player();applyShoeStyle(player.group,state.shoeStyle||0);traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateMarkers();installPhoneControls();applyPhoneMode();dom.engine.textContent='3D engine ready • Living World Beta 1.3';$('newGame').disabled=false;$('continueGame').disabled=false;$('titleSettings').disabled=false;animate();}catch(e){console.error(e);dom.engine.textContent='Startup error — '+(e.message||'unknown error');dom.engine.classList.add('error');}}
 
 window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'){if(state.dialogue){missions.nextDialogue();return;}if(state.mapOpen){closeMap();return;}if(state.shopOpen){closeShop();return;}if(!dom.settings.classList.contains('hidden')){closeSettings();return;}pauseGame(!state.paused);}if(!state.running||state.paused)return;if(e.code==='KeyE')interact();if(e.code==='KeyF'){if(player.inCar)player.exitVehicle();else{const c=traffic.nearest(player.position);if(c)player.enterVehicle(c);}}if(e.code==='KeyQ')player.shove();if(e.code==='KeyM')openMap(false);if(e.code==='KeyU')player.unstuck();});
 window.addEventListener('keyup',e=>keys[e.code]=false);window.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer?.domElement){mouse.dx+=e.movementX;mouse.dy+=e.movementY;}});window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
