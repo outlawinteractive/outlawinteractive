@@ -30,7 +30,7 @@ button{cursor:pointer}
 #titleScreen{background:radial-gradient(circle at 15% 20%,rgba(168,108,255,.22),transparent 35%),radial-gradient(circle at 85% 35%,rgba(78,232,255,.18),transparent 38%),linear-gradient(180deg,#0a1022,#03040b)}
 #titleScreen:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;transform:perspective(520px) rotateX(55deg) scale(1.45) translateY(29%);transform-origin:center bottom}
 .titleCard{position:relative;width:min(980px,93vw);border-radius:28px;padding:40px;overflow:hidden}
-.titleCard:after{content:"BETA 1.1";position:absolute;right:25px;top:23px;padding:7px 11px;border-radius:999px;border:1px solid rgba(78,232,255,.4);background:rgba(78,232,255,.09);color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:.16em}
+.titleCard:after{content:"BETA 1.2";position:absolute;right:25px;top:23px;padding:7px 11px;border-radius:999px;border:1px solid rgba(78,232,255,.4);background:rgba(78,232,255,.09);color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:.16em}
 .eyebrow{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--cyan);font-weight:900}
 h1{margin:9px 0 0;font-size:clamp(48px,8.7vw,112px);line-height:.82;text-transform:uppercase;letter-spacing:-.07em}
 h1 span{display:block;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.62);text-shadow:0 0 38px rgba(168,108,255,.28)}
@@ -191,6 +191,30 @@ body.phone-mode canvas{touch-action:none}
   #minimapFrame{bottom:150px;width:116px;height:116px}
 }
 
+
+/* ==========================================================
+   BETA 1.2 — VISUAL & UI REBUILD
+   ========================================================== */
+:root{--panel:rgba(7,12,25,.78);--panel2:rgba(12,20,38,.88);--line:rgba(155,225,255,.18)}
+.glass{background:linear-gradient(145deg,rgba(15,26,48,.88),rgba(4,8,18,.76));border-color:rgba(135,220,255,.2);box-shadow:0 16px 55px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)}
+#missionPanel{border-left:3px solid var(--cyan);padding-left:15px}
+#missionTitle{font-size:13px;letter-spacing:.1em}
+#missionObjective{font-size:12px;color:#eef5ff}
+#topRight{padding:10px 13px;border-radius:14px;background:rgba(4,8,18,.52);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px)}
+#money{font-variant-numeric:tabular-nums;letter-spacing:.035em}
+#prompt{border:1px solid rgba(78,232,255,.32);background:linear-gradient(135deg,rgba(6,14,29,.94),rgba(25,18,48,.91));box-shadow:0 12px 40px rgba(0,0,0,.48),0 0 24px rgba(78,232,255,.09)}
+#prompt:before{content:'E';display:inline-grid;place-items:center;margin-right:9px;width:25px;height:25px;border-radius:7px;background:var(--cyan);color:#061019;font-size:11px;font-weight:1000}
+#statusPanel{border-top:2px solid rgba(168,108,255,.5)}
+.bar{height:7px;background:rgba(0,0,0,.62)}
+.shopCard{width:min(1040px,96vw);border-top:3px solid var(--pink)}
+.shopItem{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.025));transition:.18s}
+.shopItem:hover{transform:translateY(-2px);border-color:rgba(78,232,255,.38)}
+.shopItem.equipped{border-color:rgba(96,245,167,.65);box-shadow:inset 0 0 0 1px rgba(96,245,167,.18)}
+.shopItem .swatches{display:flex;gap:5px;margin:8px 0 12px}
+.shopItem .swatches i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.4)}
+#shopDescription{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
+.titleCard:after{content:'BETA 1.2 • WORLD REBUILD'}
+
 </style>
 </head>
 <body>
@@ -198,7 +222,7 @@ body.phone-mode canvas{touch-action:none}
   <div class="titleCard glass">
     <div class="eyebrow">Neon Dominion original open-world beta</div>
     <h1>Crown <span>City Living World</span></h1>
-    <div class="subtitle">A larger living-world beta with furnished interiors, detailed storefront windows, compact city signs, a proper phone-control mode, clearer mission vehicles, denser crowds, vegetation, river channels, tunnels, hills and winding scenic roads.</div>
+    <div class="subtitle">Beta 1.2 rebuild: upgraded procedural materials, smarter pavement-based pedestrians, lane-following traffic, richer interiors, fixed shop exits, improved outfit browsing, clearer prompts and a cleaner modern HUD.</div>
     <div class="menuRow">
       <button id="newGame" class="primary" disabled>New Game</button>
       <button id="continueGame" class="secondary" disabled>Continue</button>
@@ -14104,7 +14128,130 @@ function quitTitle(){saveGame(false);state.running=false;state.paused=false;stat
 
 function animate(){requestAnimationFrame(animate);let dt=Math.min(.05,gameClock.getDelta());if(state.running&&!state.paused){player.update(dt);traffic.update(dt);pedestrians.update(dt);police.update(dt);commerce.update(dt);missions.update(dt);weather.update(dt);updatePrompt();updateGPS();drawMinimap();updateLighting(dt);updateClockDistrict();updateHud();startMarker.userData.animate(performance.now()/1000);objectiveMarker.userData.animate(performance.now()/1000);if(player.inCar){dom.speed.firstChild.nodeValue=Math.round(Math.abs(player.inCar.speed)*3.6);}if(toastTimer>0&&(toastTimer-=dt)<=0)dom.toast.classList.remove('show');if(bannerTimer>0&&(bannerTimer-=dt)<=0)dom.banner.classList.remove('show');}else if(state.title){updateLighting(dt*.1);camera.position.set(Math.sin(performance.now()*.00008)*100,65,Math.cos(performance.now()*.00008)*100);camera.lookAt(0,14,0);}renderer.render(scene,camera);}
 
-function boot(){try{initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();worldEnhancements=new WorldEnhancementSystem();player=new Player();applyShoeStyle(player.group,state.shoeStyle||0);traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateMarkers();installPhoneControls();applyPhoneMode();dom.engine.textContent='3D engine ready • Living World Beta';$('newGame').disabled=false;$('continueGame').disabled=false;$('titleSettings').disabled=false;animate();}catch(e){console.error(e);dom.engine.textContent='Startup error — '+(e.message||'unknown error');dom.engine.classList.add('error');}}
+
+/* ==========================================================
+   NEON DOMINION BETA 1.2 — WORLD, AI, INTERIOR & SHOP PATCH
+   ========================================================== */
+
+// Richer procedural surfaces without external image files.
+function ndTexture(key,w,h,draw,rx=1,ry=1){return canvasTexture('b12_'+key,w,h,draw,rx,ry);}
+roadTexture=function(){return ndTexture('road',768,768,(x,w,h)=>{
+ const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#24272d');g.addColorStop(.5,'#30343a');g.addColorStop(1,'#202329');x.fillStyle=g;x.fillRect(0,0,w,h);
+ for(let i=0;i<22000;i++){const c=Math.floor(rand(25,80));x.fillStyle=`rgba(${c},${c},${c+4},${rand(.018,.1)})`;x.fillRect(rand(0,w),rand(0,h),rand(.4,2.2),rand(.4,2.2));}
+ for(let i=0;i<34;i++){x.strokeStyle=`rgba(8,10,14,${rand(.08,.26)})`;x.lineWidth=rand(.5,2);x.beginPath();let px=rand(0,w),py=rand(0,h);x.moveTo(px,py);for(let k=0;k<8;k++){px+=rand(-42,42);py+=rand(18,70);x.lineTo(px,py);}x.stroke();}
+ x.fillStyle='#e5c653';for(let y=-30;y<h;y+=96)x.fillRect(w/2-4,y,8,48);
+ x.fillStyle='rgba(245,245,230,.76)';x.fillRect(52,0,4,h);x.fillRect(w-56,0,4,h);
+},2,3);};
+sidewalkTexture=function(){return ndTexture('pavement',512,512,(x,w,h)=>{
+ x.fillStyle='#858b92';x.fillRect(0,0,w,h);for(let py=0;py<h;py+=64)for(let px=0;px<w;px+=64){const v=Math.floor(rand(118,158));x.fillStyle=`rgb(${v},${v+2},${v+5})`;x.fillRect(px+2,py+2,60,60);x.strokeStyle='rgba(35,39,44,.42)';x.strokeRect(px+1,py+1,62,62);}
+ for(let i=0;i<1400;i++){x.fillStyle=`rgba(255,255,255,${rand(.015,.08)})`;x.fillRect(rand(0,w),rand(0,h),rand(.5,2),rand(.5,2));}
+},5,5);};
+grassTexture=function(){return ndTexture('grass',512,512,(x,w,h)=>{
+ const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#254f34');g.addColorStop(.5,'#357148');g.addColorStop(1,'#1d452d');x.fillStyle=g;x.fillRect(0,0,w,h);
+ for(let i=0;i<9000;i++){const hue=rand(70,135),light=rand(20,48);x.strokeStyle=`hsla(${hue},${rand(25,60)}%,${light}%,${rand(.08,.3)})`;const px=rand(0,w),py=rand(0,h);x.beginPath();x.moveTo(px,py);x.lineTo(px+rand(-2,2),py-rand(2,8));x.stroke();}
+},10,10);};
+waterTexture=function(){return ndTexture('water',768,768,(x,w,h)=>{
+ const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#062b46');g.addColorStop(.35,'#0b5f78');g.addColorStop(.7,'#168da0');g.addColorStop(1,'#07344f');x.fillStyle=g;x.fillRect(0,0,w,h);
+ for(let y=0;y<h;y+=18){x.strokeStyle=`rgba(176,241,255,${rand(.035,.14)})`;x.lineWidth=rand(.6,2.2);x.beginPath();for(let px=0;px<=w;px+=16){const py=y+Math.sin(px*.038+y*.02)*rand(2,7);px?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
+},4,4);};
+facadeTexture=function(index){const p=DATA.facades[index%DATA.facades.length],key='facade_b12_'+p.id;if(texCache[key])return texCache[key];return canvasTexture(key,512,768,(x,w,h)=>{
+ const base='#'+Number(p.base).toString(16).padStart(6,'0'),trim='#'+Number(p.trim).toString(16).padStart(6,'0'),dark='#'+Number(p.dark).toString(16).padStart(6,'0'),glow='#'+Number(p.glow).toString(16).padStart(6,'0');
+ const grad=x.createLinearGradient(0,0,w,h);grad.addColorStop(0,base);grad.addColorStop(.55,trim);grad.addColorStop(1,base);x.fillStyle=grad;x.fillRect(0,0,w,h);
+ for(let i=0;i<2500;i++){x.fillStyle=`rgba(255,255,255,${rand(.008,.035)})`;x.fillRect(rand(0,w),rand(0,h),rand(.4,2),rand(.4,3));}
+ const cw=w/p.columns,rh=h/p.rows;for(let r=0;r<p.rows;r++)for(let c=0;c<p.columns;c++){const px=c*cw+cw*.13,py=r*rh+rh*.14,lit=hash2(c+p.id*17,r-p.id*11,p.id)<p.windowChance;x.fillStyle=lit?(hash2(c,r,p.id+5)>.55?glow:'#ccecff'):dark;x.fillRect(px,py,cw*.74,rh*.61);const wg=x.createLinearGradient(px,py,px+cw*.7,py+rh*.6);wg.addColorStop(0,'rgba(255,255,255,.24)');wg.addColorStop(.28,'rgba(255,255,255,.03)');wg.addColorStop(1,'rgba(0,0,0,.22)');x.fillStyle=wg;x.fillRect(px,py,cw*.74,rh*.61);x.fillStyle='rgba(210,230,245,.16)';x.fillRect(px+cw*.36,py,2,rh*.61);}
+ x.fillStyle=trim;for(let c=0;c<=p.columns;c++)x.fillRect(c*cw-3,0,6,h);for(let r=0;r<=p.rows;r++)x.fillRect(0,r*rh-2,w,4);
+},2,5);};
+
+// More detailed, layered trees.
+WorldManager.prototype.createTree=function(x,z,s=1){
+ const g=new THREE.Group();
+ const bark=new THREE.MeshStandardMaterial({color:pick([0x563621,0x69432a,0x49301f]),roughness:1,map:ndTexture('bark',256,512,(c,w,h)=>{c.fillStyle='#5a3823';c.fillRect(0,0,w,h);for(let i=0;i<300;i++){c.strokeStyle=`rgba(25,12,6,${rand(.08,.3)})`;c.lineWidth=rand(1,4);c.beginPath();c.moveTo(rand(0,w),0);c.lineTo(rand(0,w),h);c.stroke();}},2,4)});
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.25,.42,3.8,10),bark);trunk.position.y=1.9;g.add(trunk);
+ const leafColors=[0x276943,0x327d4e,0x3c8b56];for(let i=0;i<5;i++){const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(rand(1.05,1.65),2),new THREE.MeshStandardMaterial({color:pick(leafColors),roughness:.95}));crown.position.set(rand(-.8,.8),rand(3.5,5.1),rand(-.7,.7));crown.scale.set(rand(.8,1.3),rand(.8,1.35),rand(.8,1.25));g.add(crown);}
+ for(let i=0;i<3;i++){const branch=new THREE.Mesh(new THREE.CylinderGeometry(.07,.12,1.8,7),bark);branch.position.set(rand(-.25,.25),rand(2.5,3.5),rand(-.2,.2));branch.rotation.z=rand(-1,1);branch.rotation.x=rand(-.5,.5);g.add(branch);}
+ g.position.set(x,0,z);g.scale.setScalar(s);g.traverse(o=>{if(o.isMesh){o.castShadow=settings.shadows;o.receiveShadow=true;}});return g;
+};
+
+// Furnished interiors with distinct layouts and a clearly separated exit zone.
+InteriorManager.prototype.build=function(type,id){
+ const x=5200+(this.counter%20)*96,z=5200+Math.floor(this.counter/20)*86;this.counter++;const g=new THREE.Group();g.position.set(x,0,z);
+ const palettes={shop:[0x242a38,0x989da5,0xff5ac8],apartment:[0xd7d0c3,0x66584c,0x60f5a7],office:[0x9ca6b2,0x2d3542,0x4ee8ff],lobby:[0xa9a39b,0x343a45,0xffd35f],storage:[0x565b60,0x272b31,0xff8b55]};const pal=palettes[type]||palettes.lobby;
+ const floorMat=new THREE.MeshStandardMaterial({map:type==='storage'?roadTexture():sidewalkTexture(),color:type==='apartment'?0xd8c9b4:0xffffff,roughness:.7});const wallMat=new THREE.MeshStandardMaterial({color:pal[0],roughness:.72});
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(48,40),floorMat);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;g.add(floor);
+ const ceiling=new THREE.Mesh(new THREE.PlaneGeometry(48,40),new THREE.MeshStandardMaterial({color:0xe5e7eb,roughness:.9,side:THREE.DoubleSide}));ceiling.rotation.x=Math.PI/2;ceiling.position.y=6;g.add(ceiling);
+ const wallGeoH=new THREE.BoxGeometry(48,6,.5),wallGeoV=new THREE.BoxGeometry(.5,6,40);for(const [wx,wy,wz,geo]of[[0,3,-20,wallGeoH],[0,3,20,wallGeoH],[-24,3,0,wallGeoV],[24,3,0,wallGeoV]]){const w=new THREE.Mesh(geo,wallMat);w.position.set(wx,wy,wz);g.add(w);}
+ // Lighting strips
+ for(const lx of[-14,0,14]){const lightPanel=new THREE.Mesh(new THREE.BoxGeometry(7,.06,.7),new THREE.MeshBasicMaterial({color:0xe8f7ff}));lightPanel.position.set(lx,5.92,0);g.add(lightPanel);}
+ const wood=new THREE.MeshStandardMaterial({color:0x79563e,roughness:.72}),dark=new THREE.MeshStandardMaterial({color:pal[1],roughness:.55,metalness:.12}),accent=new THREE.MeshStandardMaterial({color:pal[2],roughness:.4,metalness:.15,emissive:pal[2],emissiveIntensity:.06});
+ const addBox=(sx,sy,sz,px,py,pz,mat=dark)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.position.set(px,py,pz);g.add(m);return m;};
+ if(type==='shop'){
+   for(const px of[-17,-10,-3,4,11,18]){addBox(3,.7,1.4,px,.9,-12,wood);addBox(2.2,2.5,.35,px,2.1,-18.8,dark);}
+   addBox(15,1.15,2.4,7,.58,8,wood);addBox(4,3,.5,-18,2,4,accent);
+   for(let i=0;i<8;i++){const mannequin=createCharacterMesh({outfit:(i*13)%DATA.outfits.length});mannequin.scale.setScalar(.72);mannequin.position.set(-17+i*4.7,0,-10);mannequin.rotation.y=Math.PI;g.add(mannequin);}
+ }else if(type==='apartment'){
+   addBox(10,.8,5,-10,.4,-9,wood);addBox(9,1.1,4,-10,1.2,-9,dark);addBox(10,.7,1,-10,2,-11,accent);addBox(8,.6,4,10,.3,-8,wood);addBox(2.5,1.1,2.5,9,.55,4,wood);addBox(8,2.8,.5,10,1.5,12,dark);
+ }else if(type==='office'){
+   for(const px of[-15,-5,5,15])for(const pz of[-9,4]){addBox(6,.25,3,px,1,pz,wood);addBox(1.8,1.2,.25,px,1.8,pz-.5,accent);}
+ }else{
+   addBox(18,1.2,3,0,.6,-8,wood);addBox(10,3,.7,0,1.7,-18.5,accent);for(const px of[-14,14])addBox(7,.6,2.3,px,.3,5,dark);
+ }
+ const exit=new THREE.Vector3(x,1,z+17),spawn=new THREE.Vector3(x,1,z+12.5);
+ // Visible exit sign to distinguish from shop interaction point.
+ const exitSign=new THREE.Mesh(new THREE.PlaneGeometry(4.2,1.2),new THREE.MeshBasicMaterial({map:signTexture('EXIT','#60f5a7'),transparent:true}));exitSign.position.set(0,4.5,19.72);exitSign.rotation.y=Math.PI;g.add(exitSign);
+ g.traverse(o=>{if(o.isMesh){o.castShadow=settings.shadows;o.receiveShadow=true;}});this.root.add(g);const room={id,type,group:g,exit,spawn};this.rooms.set(id,room);return room;
+};
+InteriorManager.prototype.doorNear=function(pos){return !!(this.current&&pos.distanceTo(this.current.exit)<5.2);};
+
+// Pavement navigation helpers. Pedestrians choose connected sidewalk nodes and
+// are corrected before they can clip into buildings.
+function ndSidewalkNode(pos){const step=world?.roadStep||48,rx=Math.round(pos.x/step)*step,rz=Math.round(pos.z/step)*step,dx=Math.abs(pos.x-rx),dz=Math.abs(pos.z-rz),side=pick([-1,1])*(world.roadWidth*.5+4.7);return dx<dz?new THREE.Vector3(rx+side,terrainHeightAt(rx+side,pos.z)+1,pos.z):new THREE.Vector3(pos.x,terrainHeightAt(pos.x,rz+side)+1,rz+side);}
+function ndSafePavementNear(origin,rMin=25,rMax=140){for(let tries=0;tries<20;tries++){const a=rand(0,Math.PI*2),r=rand(rMin,rMax),p=ndSidewalkNode(new THREE.Vector3(origin.x+Math.sin(a)*r,0,origin.z+Math.cos(a)*r));if(!world.collides(p.x,p.z,.5)&&!commerce?.colliders?.some(c=>p.x>c.minX&&p.x<c.maxX&&p.z>c.minZ&&p.z<c.maxZ))return p;}return ndSidewalkNode(origin.clone().add(new THREE.Vector3(18,0,18)));}
+Pedestrian.prototype.chooseTarget=function(){this.target=ndSafePavementNear(this.mesh.position,18,90);this.timer=rand(4,10);};
+Pedestrian.prototype.update=function(dt){
+ if(this.down){this.mesh.position.addScaledVector(this.velocity,dt);this.velocity.multiplyScalar(.9);return;}
+ if(!this.target||this.timer<=0||dist(this.mesh.position,this.target)<1.4)this.chooseTarget();this.timer-=dt;
+ if(world.collides(this.mesh.position.x,this.mesh.position.z,.42)){const safe=ndSafePavementNear(this.mesh.position,8,35);this.mesh.position.copy(safe);this.chooseTarget();}
+ let tx=this.target.x,tz=this.target.z;if(state.wanted>0&&dist(this.mesh.position,player.position)<20){tx=this.mesh.position.x+(this.mesh.position.x-player.position.x)*2;tz=this.mesh.position.z+(this.mesh.position.z-player.position.z)*2;}
+ const desired=Math.atan2(tx-this.mesh.position.x,tz-this.mesh.position.z);this.heading+=clamp(angleDelta(this.heading,desired),-2.4*dt,2.4*dt);const nx=this.mesh.position.x+Math.sin(this.heading)*this.speed*dt,nz=this.mesh.position.z+Math.cos(this.heading)*this.speed*dt;
+ if(!world.collides(nx,nz,.42)){this.mesh.position.x=nx;this.mesh.position.z=nz;}else this.chooseTarget();this.mesh.position.y=terrainHeightAt(this.mesh.position.x,this.mesh.position.z)+1;this.mesh.rotation.y=this.heading;this.mesh.userData.animate(this.speed,performance.now()/1000);
+};
+PedestrianSystem.prototype.spawn=function(){const n=new Pedestrian(Math.floor(rand(0,DATA.outfits.length))),base=player?.position||new THREE.Vector3(),p=ndSafePavementNear(base,30,150);n.mesh.position.copy(p);n.chooseTarget();this.people.push(n);};
+
+// Proper cardinal road lanes. Cars stay centred in a lane and only turn at intersections.
+function ndCardinalHeading(axis,dir){return axis==='z'?(dir>0?0:Math.PI):(dir>0?Math.PI/2:-Math.PI/2);}
+function ndSetupLane(car,p){const step=world.roadStep,lane=3.25;car.routeAxis=Math.random()>.5?'x':'z';car.direction=Math.random()>.5?1:-1;if(car.routeAxis==='z'){car.laneCentre=Math.round(p.x/step)*step+(car.direction>0?-lane:lane);car.mesh.position.set(car.laneCentre,0,p.z);}else{car.laneCentre=Math.round(p.z/step)*step+(car.direction>0?lane:-lane);car.mesh.position.set(p.x,0,car.laneCentre);}car.heading=ndCardinalHeading(car.routeAxis,car.direction);car.lastIntersection='';}
+TrafficSystem.prototype.spawnAI=function(){const c=new VehicleAgent(Math.floor(rand(0,DATA.vehicles.length))),p=this.randomRoadPoint();ndSetupLane(c,p);c.targetSpeed=rand(8,14);this.cars.push(c);return c;};
+TrafficSystem.prototype.update=function(dt){
+ while(this.cars.length<settings.traffic)this.spawnAI();while(this.cars.length>settings.traffic&&!this.cars.at(-1).occupied){const c=this.cars.pop();scene.remove(c.mesh);}
+ for(const c of this.cars){if(!c.ai||c.occupied)continue;const step=world.roadStep,lane=3.25,p=c.mesh.position;
+   // Ease back to lane centre every frame.
+   if(c.routeAxis==='z')p.x=lerp(p.x,c.laneCentre,.12);else p.z=lerp(p.z,c.laneCentre,.12);
+   const along=c.routeAxis==='z'?p.z:p.x,intersection=Math.round(along/step)*step,key=c.routeAxis+':'+intersection;
+   if(Math.abs(along-intersection)<.7&&c.lastIntersection!==key){c.lastIntersection=key;if(Math.random()<.22){const oldAxis=c.routeAxis;c.routeAxis=oldAxis==='z'?'x':'z';c.direction=Math.random()>.5?1:-1;if(c.routeAxis==='z'){c.laneCentre=Math.round(p.x/step)*step+(c.direction>0?-lane:lane);p.x=c.laneCentre;p.z=intersection;}else{c.laneCentre=Math.round(p.z/step)*step+(c.direction>0?lane:-lane);p.z=c.laneCentre;p.x=intersection;}c.heading=ndCardinalHeading(c.routeAxis,c.direction);}}
+   let blockedAhead=false;for(const other of this.cars){if(other===c)continue;const forwardX=Math.sin(c.heading),forwardZ=Math.cos(c.heading),dx=other.mesh.position.x-p.x,dz=other.mesh.position.z-p.z,front=dx*forwardX+dz*forwardZ,side=Math.abs(dx*forwardZ-dz*forwardX);if(front>0&&front<8&&side<2.5){blockedAhead=true;break;}}
+   const desiredSpeed=blockedAhead?0:c.targetSpeed;c.speed=lerp(c.speed,desiredSpeed,blockedAhead ? .12 : .035);const dx=Math.sin(c.heading)*c.speed*dt,dz=Math.cos(c.heading)*c.speed*dt;
+   if(!moveCarSwept(c,dx,dz,1.05)){c.speed=0;c.direction*=-1;c.heading=ndCardinalHeading(c.routeAxis,c.direction);}
+   c.mesh.position.y=terrainHeightAt(c.mesh.position.x,c.mesh.position.z);c.mesh.rotation.y=c.heading;c.mesh.userData.wheels.forEach(w=>w.rotation.x-=c.speed*dt/.35);
+   if(Math.abs(p.x)>940||Math.abs(p.z)>940)ndSetupLane(c,this.randomRoadPoint());
+ }
+};
+
+// Fix shop exit priority: near the EXIT door, E always exits rather than reopening clothes UI.
+updatePrompt=function(){clearPrompt();if(state.dialogue||state.paused)return;if(state.inInterior){
+ if(interiors.doorNear(player.position)){setPrompt('Exit to Crown City',()=>interiors.exit());return;}
+ const action=commerce.interiorAction();if(action){setPrompt(action.text.replace(/^Press E to /,''),action.action);return;}
+}else{const v=commerce.doorNear(player.position);if(v){setPrompt(v.type==='property'&&!commerce.isOwned(v.id)?'View property':'Enter '+v.name,()=>commerce.enter(v));return;}if(!state.currentMission){const m=DATA.missions[state.missionIndex];if(m&&dist(player.position,{x:m.start[0],z:m.start[1]})<7){setPrompt(`Start “${m.title}”`,()=>missions.start());return;}}const door=world.getDoorNear(player.position);if(door){setPrompt('Enter '+door.name,()=>interiors.enter(door.interior,door));return;}if(!player.inCar){const c=traffic.nearest(player.position);if(c){setPrompt('Press F to enter vehicle',()=>player.enterVehicle(c));return;}}}};
+
+// Better outfit cards with colour previews and visible equipped state.
+CommerceSystem.prototype.openClothes=function(e){const items=DATA.outfits.filter((_,i)=>i%14===0).slice(0,12).map(o=>({title:o.name,description:`${o.jacketStyle} jacket • ${o.hairStyle} hair • fully original Crown City outfit.`,price:state.outfit===o.id?'EQUIPPED':formatMoney(o.price),action:state.outfit===o.id?'Equipped':'Wear outfit',equipped:state.outfit===o.id,swatches:[o.jacket,o.shirt,o.pants,o.accent],run:()=>{if(state.outfit!==o.id&&state.money<o.price){showToast('Not enough money');return;}if(state.outfit!==o.id)state.money-=o.price;state.outfit=o.id;player.applyOutfit(o.id);applyShoeStyle(player.group,state.shoeStyle||0);showToast(o.name+' equipped');saveGame(false);this.openClothes(e);}}));openShop(e.name,'Crown City Style Studio','Preview and equip complete outfits. Walk to the glowing EXIT sign when you are finished.',items);};
+openShop=function(title,eyebrow,description,items){state.shopOpen=true;state.paused=true;dom.shop.classList.remove('hidden');document.exitPointerLock();dom.shopTitle.textContent=title;dom.shopEyebrow.textContent=eyebrow;dom.shopDescription.textContent=description;dom.shopItems.innerHTML='';for(const item of items){const card=document.createElement('div');card.className='shopItem'+(item.equipped?' equipped':'');card.innerHTML=`<h3>${item.title}</h3><p>${item.description}</p>${item.swatches?`<div class="swatches">${item.swatches.map(c=>`<i style="background:#${Number(c).toString(16).padStart(6,'0')}"></i>`).join('')}</div>`:''}<div class="price">${item.price}</div>`;const b=document.createElement('button');b.className=item.equipped?'secondary':'primary';b.textContent=item.action;b.disabled=!!item.equipped;b.onclick=item.run;card.appendChild(b);dom.shopItems.appendChild(card);}};
+
+// Animate water and keep render surfaces alive.
+const ndOldAnimate=animate;
+animate=function(){if(world?.materials?.water?.map){world.materials.water.map.offset.x=(performance.now()*.000018)%1;world.materials.water.map.offset.y=(performance.now()*.000009)%1;}return ndOldAnimate();};
+
+
+function boot(){try{initThree();world=new WorldManager();interiors=new InteriorManager();commerce=new CommerceSystem();worldEnhancements=new WorldEnhancementSystem();player=new Player();applyShoeStyle(player.group,state.shoeStyle||0);traffic=new TrafficSystem();pedestrians=new PedestrianSystem();police=new PoliceSystem();weather=new WeatherSystem();missions=new MissionSystem();world.update(player.position);loadSettingsUI();updateHud();updateMarkers();installPhoneControls();applyPhoneMode();dom.engine.textContent='3D engine ready • Living World Beta 1.2';$('newGame').disabled=false;$('continueGame').disabled=false;$('titleSettings').disabled=false;animate();}catch(e){console.error(e);dom.engine.textContent='Startup error — '+(e.message||'unknown error');dom.engine.classList.add('error');}}
 
 window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'){if(state.dialogue){missions.nextDialogue();return;}if(state.mapOpen){closeMap();return;}if(state.shopOpen){closeShop();return;}if(!dom.settings.classList.contains('hidden')){closeSettings();return;}pauseGame(!state.paused);}if(!state.running||state.paused)return;if(e.code==='KeyE')interact();if(e.code==='KeyF'){if(player.inCar)player.exitVehicle();else{const c=traffic.nearest(player.position);if(c)player.enterVehicle(c);}}if(e.code==='KeyQ')player.shove();if(e.code==='KeyM')openMap(false);if(e.code==='KeyU')player.unstuck();});
 window.addEventListener('keyup',e=>keys[e.code]=false);window.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer?.domElement){mouse.dx+=e.movementX;mouse.dy+=e.movementY;}});window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
